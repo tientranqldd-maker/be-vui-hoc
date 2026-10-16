@@ -1,0 +1,24 @@
+# Danh sách lời cô giáo cần đọc
+
+- `welcome.mp3`: Xin chào con! Cô rất vui được học cùng con hôm nay.
+- `vi0.mp3`: Hôm nay cô và con học chữ a. Con nhìn lên bảng nhé.
+- `vi1.mp3`: Đây là chữ a. Con nghe cô đọc: a.
+- `vi2.mp3`: Con hãy đọc âm a theo cô nhé.
+- `vi3.mp3`: Con hãy tìm chữ a trong ba chữ trên màn hình.
+- `vi4.mp3`: Con hãy tìm chữ a trong tiếng cam nhé.
+- `vi5.mp3`: Bây giờ, con dùng ngón tay tô chữ a nhé.
+- `vi6.mp3`: Con có nhận ra chữ a không? Hãy chọn chữ a.
+- `viDone.mp3`: Con hoàn thành bài rồi! Cô khen con đã cố gắng.
+- `a.mp3`: a
+- `cam.mp3`: cam
+- `right.mp3`: Đúng rồi! Con giỏi lắm!
+- `retry.mp3`: Con thử lại nhé. Cô tin con làm được!
+- `traceDone.mp3`: Con tô rất chăm chỉ. Mình học tiếp nhé!
+- `math0.mp3`: Hôm nay mình cùng học đếm. Đây là số một.
+- `math1.mp3`: Con nhìn lên bảng. Có bao nhiêu quả táo?
+- `math2.mp3`: Con đếm xem có bao nhiêu chú chim nhé.
+- `math3.mp3`: Con đếm số ngôi sao rồi chọn đáp án nhé.
+- `math4.mp3`: Một cộng một bằng mấy? Con chọn đáp án nhé.
+- `math5.mp3`: Con cùng cô đếm những chiếc lá nhé.
+- `mathDone.mp3`: Hôm nay con học đếm rất chăm chỉ. Cô khen con!
+- `bye.mp3`: Hẹn gặp lại con trong buổi học sau nhé.

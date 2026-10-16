@@ -16,3 +16,14 @@
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
 /* Request light rendering even when browser/OS is set to dark. Some proprietary browsers may override this anyway. */
 @media(prefers-color-scheme:dark){:root,html,body,#app{color-scheme:only light!important;background:#fff6dc!important;color:#342f56!important}}
+
+/* Góc ghi âm dành cho phụ huynh — V2.4.1 */
+.voice-mode{display:block;max-width:100%;width:100%;margin:8px 0 15px;border:2px solid #cfc3ec;border-radius:13px;padding:13px;background:#fff!important;color:#493665;font-weight:800;font-size:16px}
+.voice-list{max-height:540px;overflow:auto;border:2px solid #ede1ef;border-radius:17px;padding:4px;margin-top:11px}
+.voice-item{padding:13px 9px;border-bottom:1px solid #eee6ed}
+.voice-item:last-child{border-bottom:0}
+.voice-script{display:grid;gap:5px;font-size:15px;line-height:1.5}
+.voice-script span{font-weight:600;color:#514761}
+.voice-actions{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+.voice-actions .btn-outline,.voice-actions .upload{font-size:13px;min-height:42px;padding:10px 12px}
+.parent-panel h3{margin:16px 0 4px;font-size:18px}

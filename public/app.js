@@ -1,9 +1,36 @@
-/* BÉ VUI HỌC V2.4 — static HTTPS/PWA demonstration. No AI or cloud storage. */
+/* BÉ VUI HỌC V2.4.1 — verified speech inputs; obsolete demo voices are disabled. */
 (() => {
 'use strict';
 const KEY = 'be-vui-hoc-v24-family';
+const VOICE_PREF_KEY = 'be-vui-hoc-voice-v241';
 const OLD = 'be-vui-hoc-v22-family';
-const AUDIO = Object.fromEntries('welcome vi0 vi1 vi2 vi3 vi4 vi5 vi6 viDone a cam right retry traceDone math0 math1 math2 math3 math4 math5 mathDone bye'.split(' ').map(k => [k, `./audio/${k}.mp3`]));
+const CLIPS = {
+ "welcome": "Xin chào con! Cô rất vui được học cùng con hôm nay.",
+ "vi0": "Hôm nay cô và con học chữ a. Con nhìn lên bảng nhé.",
+ "vi1": "Đây là chữ a. Con nghe cô đọc: a.",
+ "vi2": "Con hãy đọc âm a theo cô nhé.",
+ "vi3": "Con hãy tìm chữ a trong ba chữ trên màn hình.",
+ "vi4": "Con hãy tìm chữ a trong tiếng cam nhé.",
+ "vi5": "Bây giờ, con dùng ngón tay tô chữ a nhé.",
+ "vi6": "Con có nhận ra chữ a không? Hãy chọn chữ a.",
+ "viDone": "Con hoàn thành bài rồi! Cô khen con đã cố gắng.",
+ "a": "a",
+ "cam": "cam",
+ "right": "Đúng rồi! Con giỏi lắm!",
+ "retry": "Con thử lại nhé. Cô tin con làm được!",
+ "traceDone": "Con tô rất chăm chỉ. Mình học tiếp nhé!",
+ "math0": "Hôm nay mình cùng học đếm. Đây là số một.",
+ "math1": "Con nhìn lên bảng. Có bao nhiêu quả táo?",
+ "math2": "Con đếm xem có bao nhiêu chú chim nhé.",
+ "math3": "Con đếm số ngôi sao rồi chọn đáp án nhé.",
+ "math4": "Một cộng một bằng mấy? Con chọn đáp án nhé.",
+ "math5": "Con cùng cô đếm những chiếc lá nhé.",
+ "mathDone": "Hôm nay con học đếm rất chăm chỉ. Cô khen con!",
+ "bye": "Hẹn gặp lại con trong buổi học sau nhé."
+};
+const AUDIO = Object.fromEntries(Object.keys(CLIPS).map(k=>[k,`./audio-approved/${k}.mp3`]));
+const approved = {}; const localVoiceURLs = {}; const localVoiceBlobs = {};
+let voiceMode = localStorage.getItem(VOICE_PREF_KEY) || 'approved';
 const TEACHER = './teacher.svg';
 const $ = selector => document.querySelector(selector);
 const safe = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -39,37 +66,118 @@ const lessons={
  ]}
 };
 let state=load(),screen='home',lessonId='vi',stepNum=0,solved=false,feedback='',traced=0,toastTimer=null,nowPlaying='',hasAudioError=false;
+let recorder=null, recordingId=null, recordingStream=null;
 const audio = $('#teacherAudio');
 const kid=()=>state.kids[state.active];
 function save(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch{toast('Không thể lưu tiến độ. Ba mẹ vui lòng kiểm tra bộ nhớ trình duyệt.')}}
 function toast(txt){const el=$('#toast');el.textContent=txt;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),3800)}
-function setAudioStatus(text,kind='info'){
- const el=$('#audioStatus');if(el){el.textContent=text;el.dataset.status=kind;}
- const dot=$('#talkDot');if(dot)dot.textContent=kind==='playing'?'●':'';
+function setAudioStatus(message,kind='info'){
+ const el=$('#audioStatus');if(el){el.textContent=message;el.dataset.status=kind;}
  const portrait=$('.portrait');if(portrait)portrait.classList.toggle('speaking',kind==='playing');
- const help=$('#audioHelp');if(help)help.hidden=kind!=='error';
+ const dot=$('#talkDot');if(dot)dot.textContent=kind==='playing'?'●':'';
 }
-function stopAudio(){audio.pause();nowPlaying='';}
-function playClip(id){
- const file=AUDIO[id];if(!file){setAudioStatus('Chưa có file âm thanh cho hoạt động này.','error');return;}
- hasAudioError=false;
- nowPlaying=id;
+function stopAudio(){
+ audio.pause();nowPlaying='';
+ try{window.speechSynthesis?.cancel()}catch{}
+}
+function sourceFor(id){
+ if(localVoiceURLs[id])return localVoiceURLs[id];
+ if(approved[id])return AUDIO[id];
+ return null;
+}
+function getVietnameseVoice(){
+ const voices=window.speechSynthesis?.getVoices?.()||[];
+ return voices.find(v=>v.lang.toLowerCase()==='vi-vn')||voices.find(v=>v.lang.toLowerCase().startsWith('vi'))||null;
+}
+function speakBrowser(id){
+ const voice=getVietnameseVoice();
+ if(!voice){setAudioStatus('⚠️ Máy chưa có giọng đọc tiếng Việt. Ba mẹ hãy thêm bản ghi âm ở Góc ba mẹ.','error');return;}
  try{
-  audio.pause();audio.src=file;audio.load();audio.volume=1;audio.playbackRate=state.speed;
-  setAudioStatus('⏳ Đang mở bài nghe…');
-  const p=audio.play();
-  if(p&&typeof p.catch==='function')p.catch(err=>{
-   if(nowPlaying!==id)return;
-   hasAudioError=true;setAudioStatus('⚠️ Chưa phát được tiếng. Hãy chạm “Nghe lại” hoặc mở tệp MP3 để thử.','error');
-  });
- }catch{
-  hasAudioError=true;setAudioStatus('⚠️ Trình duyệt không phát được MP3.','error');
- }
+  window.speechSynthesis.cancel();const ut=new SpeechSynthesisUtterance(CLIPS[id]);
+  ut.lang='vi-VN'; ut.voice=voice;ut.rate=Math.min(.96,Math.max(.72,state.speed*.86));ut.pitch=1;ut.volume=1;
+  ut.onstart=()=>setAudioStatus(`🔊 Đang đọc bằng giọng ${voice.name}. Ba mẹ cần kiểm tra độ rõ.`, 'playing');
+  ut.onend=()=>setAudioStatus('Đã đọc xong. Chạm nghe lại nếu cần.','done');
+  ut.onerror=()=>setAudioStatus('⚠️ Giọng đọc trên máy không hoạt động. Hãy dùng giọng ghi âm.','error');
+  window.speechSynthesis.speak(ut);
+ }catch{setAudioStatus('⚠️ Trình duyệt không hỗ trợ đọc tiếng Việt.','error')}
 }
-audio.addEventListener('playing',()=>{if(nowPlaying)setAudioStatus('🔊 Cô đang đọc…','playing')});
-audio.addEventListener('ended',()=>setAudioStatus('✅ Con có thể nghe lại nhé.','done'));
-audio.addEventListener('error',()=>{if(nowPlaying)setAudioStatus('⚠️ Không tải được âm thanh. Kiểm tra mạng hoặc tệp MP3.','error')});
-audio.addEventListener('stalled',()=>{if(nowPlaying)setAudioStatus('⏳ Đang tải âm thanh…')});
+function playClip(id){
+ if(!CLIPS[id]){setAudioStatus('Chưa có nội dung giọng đọc cho bước này.','error');return;}
+ stopAudio();nowPlaying=id;
+ if(voiceMode==='browser')return speakBrowser(id);
+ const url=sourceFor(id);
+ if(!url){setAudioStatus('🔇 Chưa có giọng cô giáo rõ ràng cho bài này. Ba mẹ hãy bổ sung ở Góc ba mẹ.','error');return;}
+ try{
+  audio.src=url;audio.volume=1;audio.playbackRate=state.speed;audio.load();
+  setAudioStatus('⏳ Đang mở giọng cô giáo…');
+  const p=audio.play();if(p?.catch)p.catch(()=>{if(nowPlaying===id)setAudioStatus('⚠️ Không phát được bản ghi âm. Ba mẹ thử trong Góc ba mẹ.','error')});
+ }catch{setAudioStatus('⚠️ Không thể mở bản ghi âm.','error')}
+}
+function playTone(){
+ stopAudio();nowPlaying='tone';
+ try{audio.src='./audio/test-tone.mp3?v=241';audio.load();audio.volume=1;audio.playbackRate=1;
+ setAudioStatus('⏳ Đang kiểm tra loa…');
+ const p=audio.play();if(p?.catch)p.catch(()=>setAudioStatus('⚠️ Không phát được âm thanh kiểm tra.','error'));
+ }catch{setAudioStatus('⚠️ Không phát được âm thanh kiểm tra.','error')}
+}
+audio.addEventListener('playing',()=>{if(nowPlaying)setAudioStatus(nowPlaying==='tone'?'🔔 Đang phát chuông kiểm tra loa…':'🔊 Đang phát bản ghi âm…','playing')});
+audio.addEventListener('ended',()=>setAudioStatus(nowPlaying==='tone'?'✅ Đã phát chuông. Nếu cô vẫn nói khó hiểu, lỗi nằm ở bản ghi giọng.':'✅ Đã phát xong. Ba mẹ hãy kiểm tra lời nói có rõ hay không.','done'));
+audio.addEventListener('error',()=>{if(nowPlaying)setAudioStatus('⚠️ Tệp âm thanh không tải được hoặc không được trình duyệt hỗ trợ.','error')});
+// A parent can load verified recordings from this browser (IndexedDB). This does not publish them to GitHub.
+function openVoiceDB(){return new Promise(resolve=>{
+ if(!('indexedDB'in window)){resolve(null);return;}
+ const req=indexedDB.open('be-vui-hoc-voices-v241',1);
+ req.onupgradeneeded=()=>{if(!req.result.objectStoreNames.contains('clips'))req.result.createObjectStore('clips')};
+ req.onsuccess=()=>resolve(req.result);req.onerror=()=>resolve(null);
+})}
+const voiceDB=openVoiceDB();
+async function readLocalClips(){
+ const db=await voiceDB;if(!db)return;
+ for(const id of Object.keys(CLIPS)){
+  await new Promise(done=>{const tx=db.transaction('clips','readonly');const req=tx.objectStore('clips').get(id);req.onsuccess=()=>{if(req.result instanceof Blob)useLocalBlob(id,req.result);done()};req.onerror=()=>done()});
+ }
+ if(screen==='parent')render();
+}
+function useLocalBlob(id,blob){
+ if(localVoiceURLs[id])URL.revokeObjectURL(localVoiceURLs[id]);
+ localVoiceBlobs[id]=blob;localVoiceURLs[id]=URL.createObjectURL(blob);
+}
+async function saveVoiceFile(id,file){
+ if(!CLIPS[id]||!file)return;
+ if(!((file.type||'').startsWith('audio/')||/\.(mp3|m4a|wav|ogg|webm|mp4)$/i.test(file.name||''))||file.size>15000000){toast('Chỉ nhận tệp âm thanh tối đa 15 MB.');return;}
+ useLocalBlob(id,file);
+ const db=await voiceDB;if(db){await new Promise(resolve=>{const trx=db.transaction('clips','readwrite');trx.objectStore('clips').put(file,id);trx.oncomplete=resolve;trx.onerror=resolve})}
+ toast('Đã lưu âm thanh cho: '+id+'. Hãy bấm Thử nghe để kiểm tra.');if(screen==='parent')render();
+}
+async function loadApprovedManifest(){
+ try{const res=await fetch('./audio-approved/manifest.json?v=241',{cache:'no-store'});if(!res.ok)return;
+ const m=await res.json();if(typeof m==='object'&&m){for(const id of Object.keys(CLIPS))if(m[id]===true)approved[id]=true;}
+ }catch{} if(screen==='parent')render();
+}
+async function recordToggle(id){
+ if(recordingId===id&&recorder){recorder.stop();return;}
+ if(recorder){toast('Hãy hoàn thành đoạn đang ghi âm trước.');return;}
+ if(!navigator.mediaDevices?.getUserMedia||!window.MediaRecorder){toast('Trình duyệt này không hỗ trợ thu âm. Hãy thử Chrome qua HTTPS.');return;}
+ try{
+  recordingStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true}});
+  const chunks=[];recorder=new MediaRecorder(recordingStream);recordingId=id;
+  const type=recorder.mimeType||'audio/webm';
+  recorder.ondataavailable=e=>{if(e.data.size)chunks.push(e.data)};
+  recorder.onstop=async()=>{
+   const blob=new Blob(chunks,{type});const clipId=recordingId;
+   recordingStream?.getTracks().forEach(t=>t.stop());recordingStream=null;recorder=null;recordingId=null;
+   if(blob.size>2000)await saveVoiceFile(clipId,blob);
+   else toast('Đoạn ghi âm quá ngắn. Hãy thử lại.');
+   if(screen==='parent')render();
+  };
+  recorder.start();toast('Đang ghi âm “'+CLIPS[id]+'”. Bấm Dừng ghi để lưu.');render();
+ }catch{recordingStream?.getTracks().forEach(t=>t.stop());recorder=null;recordingId=null;toast('Không được phép truy cập micro. Hãy mở bằng HTTPS và cấp quyền trong Chrome.');}
+}
+function downloadVoice(id){
+ const blob=localVoiceBlobs[id];if(!blob)return toast('Chưa có bản ghi âm trên thiết bị này.');
+ const ext=(blob.type.includes('webm')?'webm':blob.type.includes('ogg')?'ogg':blob.type.includes('wav')?'wav':blob.type.includes('mp4')?'m4a':'mp3');
+ const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`${id}.${ext}`;a.click();setTimeout(()=>URL.revokeObjectURL(url),5000);
+}
 function home(){
  const k=kid();
  return `<main class="home"><div class="page">
@@ -78,7 +186,7 @@ function home(){
  <nav class="kids" aria-label="Chọn bé học">${state.kids.map((p,i)=>`<button class="kid-tab ${i===state.active?'selected':''}" data-action="kid" data-id="${i}" aria-pressed="${i===state.active}">${i===0?'🐣':'🐰'} ${safe(p.name)}</button>`).join('')}</nav>
  <button class="btn-enter" data-action="start" data-id="${k.finished.vi?'math':'vi'}"><span>👩‍🏫</span><span><strong>VÀO LỚP CÙNG CÔ</strong><small>Chạm để nghe cô hướng dẫn</small></span><span aria-hidden="true">➜</span></button>
  <div class="quick-lessons"><button class="quick-card" data-action="start" data-id="vi"><span class="quick-art">🔤</span><strong>Học chữ a</strong><small>Nghe – nhìn – tập tô</small></button><button class="quick-card green" data-action="start" data-id="math"><span class="quick-art">🍎</span><strong>Đếm 1–3</strong><small>Đếm táo cùng cô</small></button></div>
- <button class="audio-test-home" data-action="audio-test">🔊 Kiểm tra tiếng cô giáo</button><div id="audioStatus" class="sound-status" aria-live="polite">Chạm nút loa để thử âm thanh.</div>
+ <button class="audio-test-home" data-action="tone">🔔 Kiểm tra loa</button><button class="audio-test-home" data-action="audio-test">👩‍🏫 Thử nghe giọng cô</button><div id="audioStatus" class="sound-status" aria-live="polite">Hãy thử chuông trước, sau đó thử nghe giọng cô.</div>
  <div class="stars-note">⭐ ${k.stars} ngôi sao của ${safe(k.name)} · Học vui mỗi ngày một chút 💛</div>
  </div></main>`;
 }
@@ -110,16 +218,27 @@ function lesson(){
  <div class="board"><div class="board-label">${safe(s.title)}</div>${boardContent(s.board)}</div>
  ${done?`<div class="end-block"><h1>Con giỏi lắm! 🌟</h1><p>Cô khen sự cố gắng của con.</p><button class="btn-next" data-action="home">🏠 Về lớp học</button><button class="btn-outline" data-action="repeat">↺ Học lại</button></div>`:
  `<div class="task-area">${activity(s)}</div><div class="controls"><button class="btn-listen" data-action="replay">🔊 Nghe cô</button><button class="btn-next" data-action="next" ${(['choose','trace'].includes(s.type)&&!solved)?'disabled':''}>${stepNum===L.steps.length-2?'Nhận sao ⭐':'Tiếp tục ➜'}</button></div>`}
- <div id="audioStatus" class="sound-status" aria-live="polite">Chạm “Nghe cô” nếu con muốn nghe lại.</div><div id="audioHelp" class="sound-help" hidden>Ba mẹ thử <a href="${AUDIO[s.say]}" target="_blank" rel="noopener">mở file MP3 trực tiếp</a> để kiểm tra âm thanh.</div></section></div></main>`;
+ <div id="audioStatus" class="sound-status" aria-live="polite">Chạm “Nghe cô” nếu con muốn nghe lại.</div></section></div></main>`;
 }
 function parent(){
  const rows=state.kids.map((p,i)=>`<div class="parent-kid"><label for="kidName${i}">${i===0?'🐣':'🐰'} Bé ${i+1}</label><input id="kidName${i}" maxlength="24" value="${safe(p.name)}"><button data-action="rename" data-id="${i}">Lưu tên</button><p>⭐ ${p.stars} sao · ${Object.keys(p.finished).length}/2 bài mẫu đã hoàn thành · ${p.correct}/${p.attempts} lần chọn đúng</p></div>`).join('');
  return `<main class="parent"><div class="parent-page"><button class="btn-outline" data-action="home">← Về lớp học</button><h1>👨‍👩‍👧‍👦 Góc ba mẹ</h1><p>Thiết lập dành cho người lớn, tách khỏi màn hình học của con.</p>
  <section class="parent-panel"><h2>Hai hồ sơ học tập</h2>${rows}</section>
- <section class="parent-panel"><h2>🔊 Kiểm tra âm thanh</h2><p>Cô giáo phát file MP3 từ website, không dùng giọng đọc trình duyệt. Hãy bấm nút để kiểm tra. Nếu không có tiếng, thử thanh phát bên dưới.</p><button class="btn-next" data-action="audio-test">🔊 Phát thử lời chào</button><div id="audioStatus" class="sound-status" aria-live="polite">Chưa kiểm tra</div><p class="native-label">Trình phát MP3 trực tiếp (dành cho ba mẹ):</p><audio controls preload="metadata" src="./audio/welcome.mp3" style="width:100%">Trình duyệt không hỗ trợ âm thanh.</audio><p class="help-note">Giọng MP3 hiện tại là bản tổng hợp thử nghiệm và chưa được kiểm chứng là giọng mẫu phát âm chuẩn. Bản này không phải cô giáo AI hội thoại.</p><label class="speed-label" for="speed">Tốc độ nghe: <span id="speedValue">${Math.round(state.speed*100)}%</span></label><input id="speed" type="range" min="0.8" max="1.1" step="0.05" value="${state.speed}"></section>
+ <section class="parent-panel"><h2>🔊 Phòng thu giọng cô giáo</h2>
+ <p><b>Bộ MP3 cũ đã được ngừng sử dụng</b> vì phát âm không đủ rõ cho trẻ. Để dạy hai bé, ba mẹ cần dùng giọng tiếng Việt đã được kiểm tra hoặc ghi âm giọng người thật.</p>
+ <div class="parent-buttons"><button class="btn-outline" data-action="tone">🔔 1. Kiểm tra loa</button><button class="btn-next" data-action="audio-test">👩‍🏫 2. Nghe câu chào</button></div>
+ <div id="audioStatus" class="sound-status" aria-live="polite">Nếu nghe chuông nhưng không hiểu lời cô, lỗi nằm ở giọng nói chứ không phải loa.</div>
+ <label class="native-label" for="voiceMode">Nguồn giọng dạy:</label>
+ <select id="voiceMode" class="voice-mode"><option value="approved" ${voiceMode==='approved'?'selected':''}>Bản ghi rõ tiếng (ưu tiên)</option><option value="browser" ${voiceMode==='browser'?'selected':''}>Giọng Việt có sẵn trong thiết bị (thử nghiệm)</option></select>
+ <p class="help-note">Chỉ sử dụng giọng thiết bị nếu ba mẹ nghe và xác nhận phát âm đạt. Cài đặt nguồn giọng được lưu trên thiết bị này.</p>
+ <h3>22 câu cô giáo cần đọc</h3>
+ <p>Bấm <b>Ghi âm</b> hoặc chọn tệp từ điện thoại/máy tính. Nghe lại và duyệt từng câu. Âm thanh tự lưu trong trình duyệt này; chưa đồng bộ sang máy khác.</p>
+ <div class="voice-list">${Object.entries(CLIPS).map(([id,script],i)=>`<div class="voice-item"><div class="voice-script"><b>${i+1}. ${safe(id)} ${localVoiceURLs[id]||approved[id]?'✅':'○'}</b><span>${safe(script)}</span></div><div class="voice-actions"><button class="btn-outline" data-action="record" data-id="${id}">${recordingId===id?'⏹ Dừng ghi':'🎙 Ghi âm'}</button><label class="upload">📁 Chọn tệp<input type="file" hidden accept="audio/*,.mp3,.m4a,.wav,.ogg,.webm" data-voice-id="${id}"></label><button class="btn-outline" data-action="clip" data-id="${id}">🔊 Thử nghe</button>${localVoiceURLs[id]?`<button class="btn-outline" data-action="voice-download" data-id="${id}">⬇ Tải</button>`:''}</div></div>`).join('')}</div>
+ <p class="help-note">Để phát trên <b>tất cả thiết bị</b>, bạn cần đưa những tệp âm thanh đã duyệt vào <code>public/audio-approved/</code> trên GitHub và cập nhật <code>manifest.json</code>. Mã nguồn có hướng dẫn. Tệp thu trên Chrome thường là WebM, không tự biến thành MP3; cần chuyển định dạng trước khi đưa vào thư mục MP3.</p>
+ <label class="speed-label" for="speed">Tốc độ nghe: <span id="speedValue">${Math.round(state.speed*100)}%</span></label><input id="speed" type="range" min="0.8" max="1.1" step="0.05" value="${state.speed}"></section>
  <section class="parent-panel"><h2>💾 Sao lưu tiến độ</h2><p>Mỗi thiết bị lưu tiến độ riêng. Khi đổi điện thoại, ba mẹ có thể chuyển tệp JSON; chưa có đồng bộ đám mây.</p><div class="parent-buttons"><button class="btn-outline" data-action="backup">⬇️ Sao lưu</button><label class="upload">⬆️ Khôi phục <input id="restore" type="file" accept=".json,application/json" hidden></label></div></section>
  <section class="parent-panel"><h2>📱 Cài lên điện thoại</h2><p><b>Android:</b> mở địa chỉ HTTPS trên Chrome → menu ⋮ → Thêm vào màn hình chính / Cài đặt ứng dụng.</p><p><b>iPhone/iPad:</b> mở trên Safari → Chia sẻ → Thêm vào màn hình chính.</p><p><b>Windows:</b> mở trên Chrome/Edge → Cài đặt ứng dụng (nếu trình duyệt hỗ trợ).</p></section>
- <div class="version">BÉ VUI HỌC V2.4 · Hai bài mẫu: chữ a và đếm 1–3 · Không có tài khoản trực tuyến</div></div></main>`;
+ <div class="version">BÉ VUI HỌC V2.4.1 · Hai bài mẫu: chữ a và đếm 1–3 · Không có tài khoản trực tuyến</div></div></main>`;
 }
 function render(){
  $('#app').innerHTML=screen==='home'?home():screen==='lesson'?lesson():parent();
@@ -173,6 +292,9 @@ window.addEventListener('click',e=>{
   case 'next':next();break;
   case 'replay':playClip(lessons[lessonId].steps[stepNum].say);break;
   case 'audio-test':playClip('welcome');break;
+  case 'tone':playTone();break;
+  case 'record':recordToggle(id);break;
+  case 'voice-download':downloadVoice(id);break;
   case 'clip':playClip(id);break;
   case 'answer':answer(Number(id));break;
   case 'clear-trace':traced=0;solved=false;render();break;
@@ -182,8 +304,11 @@ window.addEventListener('click',e=>{
  }
 });
 window.addEventListener('input',e=>{if(e.target.id==='speed'){state.speed=Number(e.target.value);save();const txt=$('#speedValue');if(txt)txt.textContent=Math.round(state.speed*100)+'%';if(!audio.paused)audio.playbackRate=state.speed;}});
-window.addEventListener('change',e=>{if(e.target.id==='restore')restoreProgress(e.target.files[0])});
+window.addEventListener('change',e=>{if(e.target.id==='restore')restoreProgress(e.target.files[0]);
+  if(e.target.dataset.voiceId)saveVoiceFile(e.target.dataset.voiceId,e.target.files[0]);
+  if(e.target.id==='voiceMode'){voiceMode=e.target.value;localStorage.setItem(VOICE_PREF_KEY,voiceMode);stopAudio();render()}});
 window.addEventListener('pagehide',stopAudio);
 render();
+readLocalClips(); loadApprovedManifest();
 if('serviceWorker' in navigator&&location.protocol==='https:')window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
 })();
