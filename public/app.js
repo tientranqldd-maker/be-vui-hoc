@@ -1,314 +1,106 @@
-/* BÉ VUI HỌC V2.4.1 — verified speech inputs; obsolete demo voices are disabled. */
+/* BÉ VUI HỌC V2.5 - static, zero account/keys required; honest audio fallback. */
 (() => {
 'use strict';
-const KEY = 'be-vui-hoc-v24-family';
-const VOICE_PREF_KEY = 'be-vui-hoc-voice-v241';
-const OLD = 'be-vui-hoc-v22-family';
-const CLIPS = {
- "welcome": "Xin chào con! Cô rất vui được học cùng con hôm nay.",
- "vi0": "Hôm nay cô và con học chữ a. Con nhìn lên bảng nhé.",
- "vi1": "Đây là chữ a. Con nghe cô đọc: a.",
- "vi2": "Con hãy đọc âm a theo cô nhé.",
- "vi3": "Con hãy tìm chữ a trong ba chữ trên màn hình.",
- "vi4": "Con hãy tìm chữ a trong tiếng cam nhé.",
- "vi5": "Bây giờ, con dùng ngón tay tô chữ a nhé.",
- "vi6": "Con có nhận ra chữ a không? Hãy chọn chữ a.",
- "viDone": "Con hoàn thành bài rồi! Cô khen con đã cố gắng.",
- "a": "a",
- "cam": "cam",
- "right": "Đúng rồi! Con giỏi lắm!",
- "retry": "Con thử lại nhé. Cô tin con làm được!",
- "traceDone": "Con tô rất chăm chỉ. Mình học tiếp nhé!",
- "math0": "Hôm nay mình cùng học đếm. Đây là số một.",
- "math1": "Con nhìn lên bảng. Có bao nhiêu quả táo?",
- "math2": "Con đếm xem có bao nhiêu chú chim nhé.",
- "math3": "Con đếm số ngôi sao rồi chọn đáp án nhé.",
- "math4": "Một cộng một bằng mấy? Con chọn đáp án nhé.",
- "math5": "Con cùng cô đếm những chiếc lá nhé.",
- "mathDone": "Hôm nay con học đếm rất chăm chỉ. Cô khen con!",
- "bye": "Hẹn gặp lại con trong buổi học sau nhé."
-};
-const AUDIO = Object.fromEntries(Object.keys(CLIPS).map(k=>[k,`./audio-approved/${k}.mp3`]));
-const approved = {}; const localVoiceURLs = {}; const localVoiceBlobs = {};
-let voiceMode = localStorage.getItem(VOICE_PREF_KEY) || 'approved';
-const TEACHER = './teacher.svg';
-const $ = selector => document.querySelector(selector);
-const safe = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const blankKid = n => ({ name:`Bé ${n}`, stars:0, finished:{}, attempts:0, correct:0 });
-const init = () => ({active:0,kids:[blankKid(1),blankKid(2)],speed:1});
-function load(){
- try{
-  const raw=localStorage.getItem(KEY)||localStorage.getItem(OLD);
-  if(!raw)return init();
-  const s=JSON.parse(raw);if(!Array.isArray(s.kids)||s.kids.length!==2)return init();
-  return {active:s.active===1?1:0,speed:Math.max(.8,Math.min(1.1,Number(s.speed)||1)),kids:s.kids.map((k,i)=>({name:String(k.name||`Bé ${i+1}`).slice(0,24),stars:Math.max(0,Number(k.stars)||0),finished:k.finished&&typeof k.finished==='object'?k.finished:{},attempts:Number(k.attempts)||0,correct:Number(k.correct)||0}))};
- }catch{return init()}
+const $ = q=>document.querySelector(q);
+const esc = v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const KEY='be-vui-hoc-family-v25';
+const oldKeys=['be-vui-hoc-v24-family','be-vui-hoc-v22-family'];
+const initKid=i=>({name:`Bé ${i+1}`,finished:{},stars:0,attempts:0,correct:0,activity:[]});
+const initial=()=>({active:0,kids:[initKid(0),initKid(1)],voiceMode:'auto',speed:0.92});
+function readState(){let raw;try{raw=localStorage.getItem(KEY);if(!raw){for(const k of oldKeys){raw=localStorage.getItem(k);if(raw)break;}}let data=JSON.parse(raw||'null');if(!data||!Array.isArray(data.kids)||data.kids.length!==2)return initial();let base=initial();base.active=data.active===1?1:0;base.speed=Math.max(.80,Math.min(1.10,Number(data.speed)||.92));base.kids=data.kids.map((k,i)=>({name:String(k.name||`Bé ${i+1}`).slice(0,28),finished:k.finished&&typeof k.finished==='object'?k.finished:{},stars:Math.max(0,Number(k.stars)||0),attempts:Number(k.attempts)||0,correct:Number(k.correct)||0,activity:Array.isArray(k.activity)?k.activity.slice(-250):[]}));return base;}catch{return initial();}}
+let state=readState(),page='home',section='letters',currentId='',pos=0,solved=false,mistakes=0,traceDist=0,playingId='',isSpeaking=false,audioFailure=false,toastTimer,voiceSeq=0;
+const kid=()=>state.kids[state.active];const audio=$('#teacherAudio');
+const ALPHABET=[
+ ['a','áo','👕'],['ă','ăn','🍚'],['â','ấm','🫖'],['b','bóng','⚽'],['c','cá','🐟'],['d','dê','🐐'],['đ','đèn','💡'],['e','em bé','👶'],['ê','ếch','🐸'],['g','gà','🐓'],['h','hoa','🌷'],['i','in','🖨️'],['k','kem','🍦'],['l','lá','🍃'],['m','mèo','🐱'],['n','nơ','🎀'],['o','ong','🐝'],['ô','ô tô','🚗'],['ơ','ớt','🌶️'],['p','pin','🔋'],['q','quả','🍎'],['r','rổ','🧺'],['s','sao','⭐'],['t','táo','🍎'],['u','ủng','🥾'],['ư','ướt','💦'],['v','voi','🐘'],['x','xe','🚙'],['y','y tá','👩‍⚕️']
+];
+const SHAPES=[['tròn','🔴','Hình tròn'],['vuông','🟦','Hình vuông'],['tam giác','🔺','Hình tam giác'],['chữ nhật','▰','Hình chữ nhật']];
+const COLORS=[['đỏ','🔴'],['vàng','🟡'],['xanh lá','🟢'],['xanh dương','🔵']];
+const SOUND=new Set('welcome vi0 vi1 vi2 vi3 vi4 vi5 vi6 viDone a cam right retry traceDone math0 math1 math2 math3 math4 math5 mathDone bye'.split(' '));
+const allLessons={};
+function addLetter(char,word,emoji,i){const id=`l_${i}`;const other=[ALPHABET[(i+1)%29][0],ALPHABET[(i+5)%29][0],ALPHABET[(i+11)%29][0]].filter(x=>x!==char);const opts=[char,other[0],other[1]];let opts2=[other[2],char,other[1]];const sample=i===0;
+ allLessons[id]={id,category:'letters',label:`Chữ ${char}`,symbol:char,desc:`${emoji} ${word}`,emoji,letter:char,word,steps:[
+ {type:'show',title:`Làm quen chữ ${char}`,say:sample?'Đây là chữ a. Áo. Con nhìn thật kỹ chữ a nhé!':`Hôm nay cô và con cùng học chữ ${char}. Con nhìn thật kỹ chữ này nhé.`,mp3:sample?'vi0':null,board:'letter'},
+ {type:'show',title:`Cô đọc mẫu`,say:sample?'Con hãy đọc theo cô âm a nhé!':`Đây là chữ ${char}. Con nghe và đọc theo cô nhé.`,mp3:sample?'vi1':null,board:'letter'},
+ {type:'choose',title:'Mắt tinh tìm chữ',say:`Con hãy tìm chữ ${char}.`,mp3:sample?'vi3':null,options:opts,answer:char,board:'letter'},
+ {type:'show',title:`Từ quen thuộc`,say:sample?'Con tìm chữ a nhé!':`Con nhìn xem. Chữ ${char} có trong từ ${word}.`,mp3:sample?'vi4':null,board:'picture'},
+ {type:'trace',title:'Tay khéo tập tô',say:`Con dùng ngón tay tô theo chữ ${char} nhé.`,mp3:sample?'vi5':null,board:'trace'},
+ {type:'choose',title:'Bé nhớ chữ nào?',say:`Con tìm lại chữ ${char} nào.`,mp3:sample?'vi6':null,options:opts2,answer:char,board:'letter'},
+ {type:'done',title:'Cô khen con!',say:'Con đã học rất chăm chỉ. Cô khen con!',mp3:sample?'viDone':null,board:'award'}
+ ]};}
+ALPHABET.forEach((a,i)=>addLetter(...a,i));
+for(let n=0;n<=10;n++){const id=`n_${n}`;const countEmoji=n===0?'∅':Array.from({length:n},()=>n<=5?'🍎':'⭐').join(' ');const wrong=[(n+1)%11,(n+2)%11];allLessons[id]={id,category:'numbers',label:`Số ${n}`,symbol:String(n),emoji:n<=5?'🍎':'⭐',desc:`Học đếm ${n}`,steps:[
+ {type:'show',title:`Số ${n}`,say:n===1?'Đây là số một. Con cùng đếm nào!':`Hôm nay cô và con học số ${n}.`,mp3:n===1?'math0':null,board:'number'},
+ {type:'show',title:'Cùng đếm nào',say:n===0?'Không có đồ vật nào là số không.':`Con cùng cô đếm ${n} đồ vật nhé.`,board:'count'},
+ {type:'choose',title:'Chọn số đúng',say:n===3?'Có bao nhiêu quả táo?':`Có mấy đồ vật? Con chọn số ${n} nào.`,mp3:n===3?'math1':null,board:'count',options:[wrong[0],n,wrong[1]].map(String),answer:String(n)},
+ {type:'trace',title:'Tập tô số',say:`Con dùng ngón tay tô số ${n} nhé.`,board:'trace'},
+ {type:'choose',title:'Ôn tập',say:`Con tìm số ${n}.`,board:'number',options:[String(n),String(wrong[1]),String(wrong[0])],answer:String(n)},
+ {type:'done',title:'Cô khen con!',say:'Con rất chăm chỉ. Cô khen con!',mp3:'mathDone',board:'award'}
+]};}
+SHAPES.forEach(([name,emoji,label],i)=>{const opts=[name,SHAPES[(i+1)%4][0],SHAPES[(i+2)%4][0]];allLessons[`s_${i}`]={id:`s_${i}`,category:'shapes',label,emoji,symbol:emoji,desc:'Nhìn hình và chọn',steps:[{type:'show',title:label,say:`Đây là ${label.toLowerCase()}. Con quan sát nhé.`,board:'shape'},{type:'choose',title:'Hình nào đúng?',say:`Con chọn ${label.toLowerCase()} nào.`,board:'shape',options:opts,answer:name},{type:'choose',title:'Con nhớ chưa?',say:`Con tìm ${label.toLowerCase()} nhé.`,board:'shape',options:[opts[2],opts[0],opts[1]],answer:name},{type:'done',title:'Con giỏi lắm!',say:'Con học rất chăm chỉ!',board:'award'}]};});
+COLORS.forEach(([name,emoji],i)=>{const opts=[name,COLORS[(i+1)%4][0],COLORS[(i+2)%4][0]];allLessons[`c_${i}`]={id:`c_${i}`,category:'colors',label:`Màu ${name}`,emoji,symbol:emoji,desc:'Phân biệt màu sắc',steps:[{type:'show',title:`Màu ${name}`,say:`Đây là màu ${name}.`,board:'shape'},{type:'choose',title:'Màu nào đúng?',say:`Con chọn màu ${name}.`,board:'shape',options:opts,answer:name},{type:'done',title:'Giỏi lắm!',say:'Cô khen con rất chăm chỉ!',board:'award'}]};});
+for(let n=1;n<=4;n++){let ans=n+1;allLessons[`a_${n}`]={id:`a_${n}`,category:'numbers',label:`Cộng ${n} + 1`,symbol:'➕',emoji:'🍎',desc:'Cộng bằng hình',steps:[{type:'show',title:'Cùng học phép cộng',say:`Có ${n} quả táo, thêm một quả nữa.`,board:'add',n},{type:'choose',title:'Có tất cả bao nhiêu?',say:`${n} cộng một bằng mấy?`,board:'add',n,options:[ans-1,ans,ans+1].map(String),answer:String(ans)},{type:'done',title:'Cô khen con!',say:'Con đã biết cộng rồi. Giỏi lắm!',board:'award'}]};}
+const ids=()=>Object.keys(allLessons);const categoryName={letters:'🔤 Học chữ cái',numbers:'🔢 Bé học Toán',shapes:'🧩 Hình dạng',colors:'🎨 Màu sắc'};
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch{toast('Không lưu được dữ liệu. Ba mẹ kiểm tra dung lượng trình duyệt.')}}
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),3900)}
+function stopVoice(){voiceSeq++;if('speechSynthesis'in window)try{speechSynthesis.cancel()}catch{};audio.pause();audio.removeAttribute('src');audio.load();playingId='';isSpeaking=false;updateSound('');}
+let voiceList=[],viVoice=null;function refreshVoices(){if(!('speechSynthesis'in window))return;voiceList=speechSynthesis.getVoices()||[];viVoice=voiceList.find(v=>/vi[-_]VN/i.test(v.lang)||/^vi$/i.test(v.lang))||null;}refreshVoices();if('speechSynthesis' in window)speechSynthesis.addEventListener?.('voiceschanged',refreshVoices);
+function updateSound(msg,err=false){let el=$('#audioStatus');if(el){el.textContent=msg;el.classList.toggle('sound-error',err);}const pic=$('.portrait');if(pic)pic.classList.toggle('speaking',isSpeaking)}
+function playBundled(mp3){
+ if(!mp3||!SOUND.has(mp3))return false;
+ const u=`./audio/${encodeURIComponent(mp3)}.mp3?v=25`;
+ playingId=mp3;audio.src=u;audio.volume=1;audio.playbackRate=state.speed;
+ updateSound('🔊 Đang mở lời giảng đã lưu…');
+ try{let result=audio.play();if(result&&result.catch)result.catch(audioFail)}catch(e){audioFail(e)}
+ return true;
 }
-const lessons={
- vi:{name:'Làm quen chữ a',symbol:'🔤',steps:[
-  {type:'show',title:'Làm quen chữ a',say:'vi0',caption:'Đây là chữ a. Áo. Con nhìn thật kỹ chữ a nhé!',board:'letter'},
-  {type:'show',title:'Cô đọc mẫu',say:'vi1',caption:'Con hãy đọc theo cô âm a nhé!',board:'letter'},
-  {type:'listen',title:'Tai nghe tinh',say:'vi2',caption:'Con hãy đọc theo cô âm a nhé!',board:'cam'},
-  {type:'choose',title:'Mắt tinh tìm chữ',say:'vi3',caption:'Con tìm chữ a nhé!',board:'letter',options:['o','a','ă'],answer:'a'},
-  {type:'choose',title:'Chữ a trong tiếng cam',say:'vi4',caption:'Con tìm chữ a nhé!',board:'cam',options:['b','a','o'],answer:'a'},
-  {type:'trace',title:'Tay khéo tập tô',say:'vi5',caption:'Con dùng ngón tay tô theo chữ a.',board:'trace'},
-  {type:'choose',title:'Bé nhớ chữ a',say:'vi6',caption:'Con tìm chữ a nhé!',board:'letter',options:['ă','o','a'],answer:'a'},
-  {type:'done',title:'Con đã hoàn thành!',say:'viDone',caption:'Chúc mừng con đã học xong bài! Con rất chăm chỉ!',board:'trophy'}
- ]},
- math:{name:'Bé tập đếm 1–3',symbol:'🍎',steps:[
-  {type:'show',title:'Làm quen số 1',say:'math0',caption:'Đây là số một. Con cùng đếm nào!',board:'one'},
-  {type:'choose',title:'Bé đếm táo',say:'math1',caption:'Có bao nhiêu quả táo?',board:'apples',options:['2','3','1'],answer:'3'},
-  {type:'choose',title:'Bé đếm chim',say:'math2',caption:'Đây là số hai. Con cùng đếm nào!',board:'birds',options:['1','3','2'],answer:'2'},
-  {type:'choose',title:'Ba ngôi sao',say:'math3',caption:'Con nghe và chọn số ba nhé!',board:'stars',options:['1','3','2'],answer:'3'},
-  {type:'choose',title:'Cộng vui',say:'math4',caption:'Một cộng một bằng mấy?',board:'add',options:['3','1','2'],answer:'2'},
-  {type:'choose',title:'Cùng ôn đếm',say:'math5',caption:'Con nghe và chọn số ba nhé!',board:'leaves',options:['3','2','1'],answer:'3'},
-  {type:'done',title:'Con đã hoàn thành!',say:'mathDone',caption:'Chúc mừng con đã học xong bài! Con rất chăm chỉ!',board:'trophy'}
- ]}
-};
-let state=load(),screen='home',lessonId='vi',stepNum=0,solved=false,feedback='',traced=0,toastTimer=null,nowPlaying='',hasAudioError=false;
-let recorder=null, recordingId=null, recordingStream=null;
-const audio = $('#teacherAudio');
-const kid=()=>state.kids[state.active];
-function save(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch{toast('Không thể lưu tiến độ. Ba mẹ vui lòng kiểm tra bộ nhớ trình duyệt.')}}
-function toast(txt){const el=$('#toast');el.textContent=txt;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),3800)}
-function setAudioStatus(message,kind='info'){
- const el=$('#audioStatus');if(el){el.textContent=message;el.dataset.status=kind;}
- const portrait=$('.portrait');if(portrait)portrait.classList.toggle('speaking',kind==='playing');
- const dot=$('#talkDot');if(dot)dot.textContent=kind==='playing'?'●':'';
-}
-function stopAudio(){
- audio.pause();nowPlaying='';
- try{window.speechSynthesis?.cancel()}catch{}
-}
-function sourceFor(id){
- if(localVoiceURLs[id])return localVoiceURLs[id];
- if(approved[id])return AUDIO[id];
- return null;
-}
-function getVietnameseVoice(){
- const voices=window.speechSynthesis?.getVoices?.()||[];
- return voices.find(v=>v.lang.toLowerCase()==='vi-vn')||voices.find(v=>v.lang.toLowerCase().startsWith('vi'))||null;
-}
-function speakBrowser(id){
- const voice=getVietnameseVoice();
- if(!voice){setAudioStatus('⚠️ Máy chưa có giọng đọc tiếng Việt. Ba mẹ hãy thêm bản ghi âm ở Góc ba mẹ.','error');return;}
- try{
-  window.speechSynthesis.cancel();const ut=new SpeechSynthesisUtterance(CLIPS[id]);
-  ut.lang='vi-VN'; ut.voice=voice;ut.rate=Math.min(.96,Math.max(.72,state.speed*.86));ut.pitch=1;ut.volume=1;
-  ut.onstart=()=>setAudioStatus(`🔊 Đang đọc bằng giọng ${voice.name}. Ba mẹ cần kiểm tra độ rõ.`, 'playing');
-  ut.onend=()=>setAudioStatus('Đã đọc xong. Chạm nghe lại nếu cần.','done');
-  ut.onerror=()=>setAudioStatus('⚠️ Giọng đọc trên máy không hoạt động. Hãy dùng giọng ghi âm.','error');
-  window.speechSynthesis.speak(ut);
- }catch{setAudioStatus('⚠️ Trình duyệt không hỗ trợ đọc tiếng Việt.','error')}
-}
-function playClip(id){
- if(!CLIPS[id]){setAudioStatus('Chưa có nội dung giọng đọc cho bước này.','error');return;}
- stopAudio();nowPlaying=id;
- if(voiceMode==='browser')return speakBrowser(id);
- const url=sourceFor(id);
- if(!url){setAudioStatus('🔇 Chưa có giọng cô giáo rõ ràng cho bài này. Ba mẹ hãy bổ sung ở Góc ba mẹ.','error');return;}
- try{
-  audio.src=url;audio.volume=1;audio.playbackRate=state.speed;audio.load();
-  setAudioStatus('⏳ Đang mở giọng cô giáo…');
-  const p=audio.play();if(p?.catch)p.catch(()=>{if(nowPlaying===id)setAudioStatus('⚠️ Không phát được bản ghi âm. Ba mẹ thử trong Góc ba mẹ.','error')});
- }catch{setAudioStatus('⚠️ Không thể mở bản ghi âm.','error')}
-}
-function playTone(){
- stopAudio();nowPlaying='tone';
- try{audio.src='./audio/test-tone.mp3?v=241';audio.load();audio.volume=1;audio.playbackRate=1;
- setAudioStatus('⏳ Đang kiểm tra loa…');
- const p=audio.play();if(p?.catch)p.catch(()=>setAudioStatus('⚠️ Không phát được âm thanh kiểm tra.','error'));
- }catch{setAudioStatus('⚠️ Không phát được âm thanh kiểm tra.','error')}
-}
-audio.addEventListener('playing',()=>{if(nowPlaying)setAudioStatus(nowPlaying==='tone'?'🔔 Đang phát chuông kiểm tra loa…':'🔊 Đang phát bản ghi âm…','playing')});
-audio.addEventListener('ended',()=>setAudioStatus(nowPlaying==='tone'?'✅ Đã phát chuông. Nếu cô vẫn nói khó hiểu, lỗi nằm ở bản ghi giọng.':'✅ Đã phát xong. Ba mẹ hãy kiểm tra lời nói có rõ hay không.','done'));
-audio.addEventListener('error',()=>{if(nowPlaying)setAudioStatus('⚠️ Tệp âm thanh không tải được hoặc không được trình duyệt hỗ trợ.','error')});
-// A parent can load verified recordings from this browser (IndexedDB). This does not publish them to GitHub.
-function openVoiceDB(){return new Promise(resolve=>{
- if(!('indexedDB'in window)){resolve(null);return;}
- const req=indexedDB.open('be-vui-hoc-voices-v241',1);
- req.onupgradeneeded=()=>{if(!req.result.objectStoreNames.contains('clips'))req.result.createObjectStore('clips')};
- req.onsuccess=()=>resolve(req.result);req.onerror=()=>resolve(null);
-})}
-const voiceDB=openVoiceDB();
-async function readLocalClips(){
- const db=await voiceDB;if(!db)return;
- for(const id of Object.keys(CLIPS)){
-  await new Promise(done=>{const tx=db.transaction('clips','readonly');const req=tx.objectStore('clips').get(id);req.onsuccess=()=>{if(req.result instanceof Blob)useLocalBlob(id,req.result);done()};req.onerror=()=>done()});
+function speak(content,mp3){
+ stopVoice();audioFailure=false;refreshVoices();
+ // Prefer a Vietnamese OS/Chrome voice when the browser actually exposes one.
+ // Otherwise use the slower, volume-normalized packaged MP3; never mislabel it as a verified voice teacher.
+ if(viVoice){
+  const seq=voiceSeq;
+  try{let u=new SpeechSynthesisUtterance(content);u.lang='vi-VN';u.voice=viVoice;
+   u.rate=Math.max(.7,Math.min(.95,state.speed));u.pitch=1;u.volume=1;
+   u.onstart=()=>{if(seq!==voiceSeq)return;isSpeaking=true;updateSound('🔊 Cô đang đọc…')};
+   u.onend=()=>{if(seq!==voiceSeq)return;isSpeaking=false;updateSound('🔁 Con có thể nghe lại nhé.')};
+   u.onerror=()=>{if(seq!==voiceSeq)return;isSpeaking=false;if(!playBundled(mp3))updateSound('⚠️ Giọng Việt của thiết bị không hoạt động. Bài này chưa có bản MP3.',true)};
+   speechSynthesis.speak(u);updateSound('⏳ Đang mở giọng tiếng Việt…');return;
+  }catch(e){if(playBundled(mp3))return;audioFail(e);return;}
  }
- if(screen==='parent')render();
+ if(playBundled(mp3))return;
+ updateSound('⚠️ Bài này chưa có giọng đọc trên thiết bị. Bé có thể học bằng hình và thao tác; giọng cô đang được bổ sung.',true);
 }
-function useLocalBlob(id,blob){
- if(localVoiceURLs[id])URL.revokeObjectURL(localVoiceURLs[id]);
- localVoiceBlobs[id]=blob;localVoiceURLs[id]=URL.createObjectURL(blob);
+function audioFail(err){audioFailure=true;isSpeaking=false;updateSound('⚠️ Không phát được lời giảng. Hãy thử nút nghe lại hoặc mở bằng Chrome.',true);}
+audio.addEventListener('playing',()=>{isSpeaking=true;updateSound('🔊 Cô đang đọc...')});audio.addEventListener('ended',()=>{isSpeaking=false;updateSound('🔁 Con có thể nghe lại nhé.')});audio.addEventListener('error',()=>{if(playingId)audioFail(new Error('mp3'))});
+function studentHeading(){return `<header class="header"><div class="logo"><span class="logo-emoji">🌈</span><span>Bé Vui Học<small>Góc lớp học của con · V2.5</small></span></div><button class="parent-link" data-act="parent">⚙️ Ba mẹ</button></header>`;}
+function home(){const k=kid(),count=Object.keys(k.finished).length;const next=ids().find(id=>!k.finished[id])||'l_0';return `<main class="home"><div class="page">${studentHeading()}<section class="classroom"><img src="./scene.svg" alt="Cô giáo trong lớp học có bảng và cửa sổ"><div class="hello">Chào <b>${esc(k.name)}</b>! 🌞<small>Cô chờ con vào lớp!</small></div></section><nav class="kids">${state.kids.map((x,i)=>`<button class="kid-tab ${i===state.active?'selected':''}" data-act="kid" data-id="${i}" aria-pressed="${i===state.active}">${i?'🐰':'🐣'} ${esc(x.name)}</button>`).join('')}</nav><button class="btn-enter" data-act="start" data-id="${next}"><span>👩‍🏫</span><span><strong>VÀO LỚP CÙNG CÔ</strong><small>${count?'Học bài tiếp theo nhé!':'Bắt đầu bài đầu tiên nhé!'}</small></span><span>➜</span></button><div class="home-stats"><span>⭐ ${k.stars} sao của con</span><span>📚 ${count} bài đã học</span></div><h2 class="lesson-header">🌷 Hôm nay con thích học gì?</h2><div class="home-grid"><button data-act="category" data-id="letters" class="lesson-tile lavender"><span>🔤</span><strong>Chữ cái</strong><small>29 chữ</small></button><button data-act="category" data-id="numbers" class="lesson-tile green"><span>🔢</span><strong>Toán vui</strong><small>Đếm và cộng</small></button><button data-act="category" data-id="shapes" class="lesson-tile peach"><span>🧩</span><strong>Hình dạng</strong><small>Quan sát</small></button><button data-act="category" data-id="colors" class="lesson-tile sky"><span>🎨</span><strong>Màu sắc</strong><small>Khám phá</small></button></div><button class="audio-test-home" data-act="sound">🔊 Nghe thử cô chào</button><div id="audioStatus" class="sound-status" role="status" aria-live="polite"></div><p class="short-note">Mỗi ngày 10–15 phút · Học vui, không so sánh thành tích 🌈</p></div></main>`;}
+function categoryView(){const items=Object.values(allLessons).filter(x=>x.category===section);return `<main class="home"><div class="page"><div class="list-head"><button class="home-back" data-act="home" aria-label="Về trang chủ">🏠</button><div><h1>${categoryName[section]}</h1><p>Chạm vào hình con muốn học cùng cô</p></div></div><div class="module-grid">${items.map(x=>`<button class="module" data-act="start" data-id="${x.id}"><span class="module-emoji">${esc(x.symbol||x.emoji)}</span><strong>${esc(x.label)}</strong><small>${esc(x.desc)}</small>${kid().finished[x.id]?'<span class="completed-mark">✓ Đã học</span>':''}</button>`).join('')}</div><p class="catalog-help">Các bài mở rộng đang dùng giọng Tiếng Việt của thiết bị nếu có. Hai bài mẫu ban đầu có tiếng MP3 đi kèm.</p></div></main>`;}
+function boardView(L,s){const isLetter=L.category==='letters';if(s.board==='award')return `<div class="award">🏆</div><div class="board-label">Hôm nay con rất cố gắng!</div>`;
+ if(s.board==='trace')return `<div class="trace-wrap"><div class="trace-ghost">${esc(L.letter||L.symbol)}</div><canvas id="tracePad" aria-label="Bảng tô chữ bằng ngón tay"></canvas></div>`;
+ if(s.board==='letter')return `<div class="huge-letter">${esc(L.letter)}</div><div class="picture-word">${L.emoji} ${esc(L.word)}</div>`;
+ if(s.board==='picture')return `<div class="huge-picture">${L.emoji}</div><div class="picture-word">${esc(L.word)}</div>`;
+ if(s.board==='number')return `<div class="big-number">${esc(L.symbol)}</div><div class="picture-word">${esc(L.desc)}</div>`;
+ if(s.board==='count'){let n=Number(L.symbol),emo=L.emoji;return `<div class="count-pics">${n===0?'<span class="empty-objects">Chưa có quả nào</span>':Array.from({length:n},()=>`<span>${emo}</span>`).join('')}</div><div class="big-number">${n}</div>`;}
+ if(s.board==='add')return `<div class="math-visual"><span>${Array.from({length:s.n},()=>L.emoji).join(' ')}</span><b>+</b><span>${L.emoji}</span></div>`;
+ if(s.board==='shape')return `<div class="huge-picture">${L.emoji}</div>`;return `<div class="huge-picture">🌈</div>`;
 }
-async function saveVoiceFile(id,file){
- if(!CLIPS[id]||!file)return;
- if(!((file.type||'').startsWith('audio/')||/\.(mp3|m4a|wav|ogg|webm|mp4)$/i.test(file.name||''))||file.size>15000000){toast('Chỉ nhận tệp âm thanh tối đa 15 MB.');return;}
- useLocalBlob(id,file);
- const db=await voiceDB;if(db){await new Promise(resolve=>{const trx=db.transaction('clips','readwrite');trx.objectStore('clips').put(file,id);trx.oncomplete=resolve;trx.onerror=resolve})}
- toast('Đã lưu âm thanh cho: '+id+'. Hãy bấm Thử nghe để kiểm tra.');if(screen==='parent')render();
-}
-async function loadApprovedManifest(){
- try{const res=await fetch('./audio-approved/manifest.json?v=241',{cache:'no-store'});if(!res.ok)return;
- const m=await res.json();if(typeof m==='object'&&m){for(const id of Object.keys(CLIPS))if(m[id]===true)approved[id]=true;}
- }catch{} if(screen==='parent')render();
-}
-async function recordToggle(id){
- if(recordingId===id&&recorder){recorder.stop();return;}
- if(recorder){toast('Hãy hoàn thành đoạn đang ghi âm trước.');return;}
- if(!navigator.mediaDevices?.getUserMedia||!window.MediaRecorder){toast('Trình duyệt này không hỗ trợ thu âm. Hãy thử Chrome qua HTTPS.');return;}
- try{
-  recordingStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true}});
-  const chunks=[];recorder=new MediaRecorder(recordingStream);recordingId=id;
-  const type=recorder.mimeType||'audio/webm';
-  recorder.ondataavailable=e=>{if(e.data.size)chunks.push(e.data)};
-  recorder.onstop=async()=>{
-   const blob=new Blob(chunks,{type});const clipId=recordingId;
-   recordingStream?.getTracks().forEach(t=>t.stop());recordingStream=null;recorder=null;recordingId=null;
-   if(blob.size>2000)await saveVoiceFile(clipId,blob);
-   else toast('Đoạn ghi âm quá ngắn. Hãy thử lại.');
-   if(screen==='parent')render();
-  };
-  recorder.start();toast('Đang ghi âm “'+CLIPS[id]+'”. Bấm Dừng ghi để lưu.');render();
- }catch{recordingStream?.getTracks().forEach(t=>t.stop());recorder=null;recordingId=null;toast('Không được phép truy cập micro. Hãy mở bằng HTTPS và cấp quyền trong Chrome.');}
-}
-function downloadVoice(id){
- const blob=localVoiceBlobs[id];if(!blob)return toast('Chưa có bản ghi âm trên thiết bị này.');
- const ext=(blob.type.includes('webm')?'webm':blob.type.includes('ogg')?'ogg':blob.type.includes('wav')?'wav':blob.type.includes('mp4')?'m4a':'mp3');
- const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`${id}.${ext}`;a.click();setTimeout(()=>URL.revokeObjectURL(url),5000);
-}
-function home(){
- const k=kid();
- return `<main class="home"><div class="page">
- <header class="header"><div class="logo"><span class="logo-emoji">🌈</span><span>Bé Vui Học<small>Lớp học của con</small></span></div><button class="parent-link" data-action="parent">⚙️ Ba mẹ</button></header>
- <section class="classroom" aria-label="Lớp học vui vẻ với cô giáo"><img src="./scene.svg" alt="Cô giáo đang vẫy tay chào trong lớp học tươi sáng"><div class="hello">Xin chào <b>${safe(k.name)}!</b> 🌞<small>Cô đang chờ con vào lớp</small></div></section>
- <nav class="kids" aria-label="Chọn bé học">${state.kids.map((p,i)=>`<button class="kid-tab ${i===state.active?'selected':''}" data-action="kid" data-id="${i}" aria-pressed="${i===state.active}">${i===0?'🐣':'🐰'} ${safe(p.name)}</button>`).join('')}</nav>
- <button class="btn-enter" data-action="start" data-id="${k.finished.vi?'math':'vi'}"><span>👩‍🏫</span><span><strong>VÀO LỚP CÙNG CÔ</strong><small>Chạm để nghe cô hướng dẫn</small></span><span aria-hidden="true">➜</span></button>
- <div class="quick-lessons"><button class="quick-card" data-action="start" data-id="vi"><span class="quick-art">🔤</span><strong>Học chữ a</strong><small>Nghe – nhìn – tập tô</small></button><button class="quick-card green" data-action="start" data-id="math"><span class="quick-art">🍎</span><strong>Đếm 1–3</strong><small>Đếm táo cùng cô</small></button></div>
- <button class="audio-test-home" data-action="tone">🔔 Kiểm tra loa</button><button class="audio-test-home" data-action="audio-test">👩‍🏫 Thử nghe giọng cô</button><div id="audioStatus" class="sound-status" aria-live="polite">Hãy thử chuông trước, sau đó thử nghe giọng cô.</div>
- <div class="stars-note">⭐ ${k.stars} ngôi sao của ${safe(k.name)} · Học vui mỗi ngày một chút 💛</div>
- </div></main>`;
-}
-function boardContent(b){
- switch(b){
-  case 'letter':return `<div class="huge-letter" aria-label="Chữ a">a</div><div class="picture-word">👕 <span>áo</span></div>`;
-  case 'cam':return `<div class="big-word"><span>c</span><b>a</b><span>m</span></div><div class="picture-word">🍊 cam</div>`;
-  case 'trace':return `<div class="trace-wrap"><div class="trace-ghost">a</div><canvas id="tracePad" aria-label="Bảng tô chữ a bằng ngón tay"></canvas></div>`;
-  case 'one':return `<div class="big-number">1</div><div class="objects">🍎</div>`;
-  case 'apples':return `<div class="objects">🍎 🍎 🍎</div>`;
-  case 'birds':return `<div class="objects">🐦 🐦</div>`;
-  case 'stars':return `<div class="objects">⭐ ⭐ ⭐</div>`;
-  case 'add':return `<div class="objects">🍎 <span class="plus">+</span> 🍎</div>`;
-  case 'leaves':return `<div class="objects">🍃 🍃 🍃</div>`;
-  default:return `<div class="award">🏆</div>`;
- }
-}
-function activity(s){
- if(s.type==='show')return `<div class="activity-intro">👀 Con nhìn lên bảng và nghe cô nhé!</div>`;
- if(s.type==='listen')return `<div class="listen-tiles"><button data-action="clip" data-id="a">🔊 Nghe âm a</button><button data-action="clip" data-id="cam">🔊 Nghe tiếng cam</button></div>`;
- if(s.type==='choose')return `<div class="choices" role="group" aria-label="Chọn đáp án">${s.options.map((o,i)=>`<button data-action="answer" data-id="${i}" class="answer" ${solved?'disabled':''}>${safe(o)}</button>`).join('')}</div><div id="feedback" class="feedback ${feedback?'visible':''}" aria-live="polite">${safe(feedback)}</div>`;
- if(s.type==='trace')return `<div class="trace-info"><span>✍️ Con tô chữ bằng ngón tay</span><button data-action="clear-trace">↺ Xóa nét</button></div>`;
- return '';
-}
-function lesson(){
- const L=lessons[lessonId],s=L.steps[stepNum],done=s.type==='done';
- return `<main class="lesson"><div class="lesson-shell"><header class="lesson-top"><button data-action="home" class="home-back" aria-label="Về trang chủ">🏠</button><div class="progress" aria-label="Bước ${stepNum+1} trên ${L.steps.length}">${L.steps.map((x,i)=>`<i class="${i<stepNum?'completed':i===stepNum?'current':''}"></i>`).join('')}</div><span class="lesson-count">${stepNum+1}/${L.steps.length}</span></header>
- <section class="learning-stage"><div class="talk-row"><img class="portrait" src="${TEACHER}" alt="Cô giáo"><div class="talk"><span id="talkDot" class="talk-dot"></span>${safe(s.caption)}</div></div>
- <div class="board"><div class="board-label">${safe(s.title)}</div>${boardContent(s.board)}</div>
- ${done?`<div class="end-block"><h1>Con giỏi lắm! 🌟</h1><p>Cô khen sự cố gắng của con.</p><button class="btn-next" data-action="home">🏠 Về lớp học</button><button class="btn-outline" data-action="repeat">↺ Học lại</button></div>`:
- `<div class="task-area">${activity(s)}</div><div class="controls"><button class="btn-listen" data-action="replay">🔊 Nghe cô</button><button class="btn-next" data-action="next" ${(['choose','trace'].includes(s.type)&&!solved)?'disabled':''}>${stepNum===L.steps.length-2?'Nhận sao ⭐':'Tiếp tục ➜'}</button></div>`}
- <div id="audioStatus" class="sound-status" aria-live="polite">Chạm “Nghe cô” nếu con muốn nghe lại.</div></section></div></main>`;
-}
-function parent(){
- const rows=state.kids.map((p,i)=>`<div class="parent-kid"><label for="kidName${i}">${i===0?'🐣':'🐰'} Bé ${i+1}</label><input id="kidName${i}" maxlength="24" value="${safe(p.name)}"><button data-action="rename" data-id="${i}">Lưu tên</button><p>⭐ ${p.stars} sao · ${Object.keys(p.finished).length}/2 bài mẫu đã hoàn thành · ${p.correct}/${p.attempts} lần chọn đúng</p></div>`).join('');
- return `<main class="parent"><div class="parent-page"><button class="btn-outline" data-action="home">← Về lớp học</button><h1>👨‍👩‍👧‍👦 Góc ba mẹ</h1><p>Thiết lập dành cho người lớn, tách khỏi màn hình học của con.</p>
- <section class="parent-panel"><h2>Hai hồ sơ học tập</h2>${rows}</section>
- <section class="parent-panel"><h2>🔊 Phòng thu giọng cô giáo</h2>
- <p><b>Bộ MP3 cũ đã được ngừng sử dụng</b> vì phát âm không đủ rõ cho trẻ. Để dạy hai bé, ba mẹ cần dùng giọng tiếng Việt đã được kiểm tra hoặc ghi âm giọng người thật.</p>
- <div class="parent-buttons"><button class="btn-outline" data-action="tone">🔔 1. Kiểm tra loa</button><button class="btn-next" data-action="audio-test">👩‍🏫 2. Nghe câu chào</button></div>
- <div id="audioStatus" class="sound-status" aria-live="polite">Nếu nghe chuông nhưng không hiểu lời cô, lỗi nằm ở giọng nói chứ không phải loa.</div>
- <label class="native-label" for="voiceMode">Nguồn giọng dạy:</label>
- <select id="voiceMode" class="voice-mode"><option value="approved" ${voiceMode==='approved'?'selected':''}>Bản ghi rõ tiếng (ưu tiên)</option><option value="browser" ${voiceMode==='browser'?'selected':''}>Giọng Việt có sẵn trong thiết bị (thử nghiệm)</option></select>
- <p class="help-note">Chỉ sử dụng giọng thiết bị nếu ba mẹ nghe và xác nhận phát âm đạt. Cài đặt nguồn giọng được lưu trên thiết bị này.</p>
- <h3>22 câu cô giáo cần đọc</h3>
- <p>Bấm <b>Ghi âm</b> hoặc chọn tệp từ điện thoại/máy tính. Nghe lại và duyệt từng câu. Âm thanh tự lưu trong trình duyệt này; chưa đồng bộ sang máy khác.</p>
- <div class="voice-list">${Object.entries(CLIPS).map(([id,script],i)=>`<div class="voice-item"><div class="voice-script"><b>${i+1}. ${safe(id)} ${localVoiceURLs[id]||approved[id]?'✅':'○'}</b><span>${safe(script)}</span></div><div class="voice-actions"><button class="btn-outline" data-action="record" data-id="${id}">${recordingId===id?'⏹ Dừng ghi':'🎙 Ghi âm'}</button><label class="upload">📁 Chọn tệp<input type="file" hidden accept="audio/*,.mp3,.m4a,.wav,.ogg,.webm" data-voice-id="${id}"></label><button class="btn-outline" data-action="clip" data-id="${id}">🔊 Thử nghe</button>${localVoiceURLs[id]?`<button class="btn-outline" data-action="voice-download" data-id="${id}">⬇ Tải</button>`:''}</div></div>`).join('')}</div>
- <p class="help-note">Để phát trên <b>tất cả thiết bị</b>, bạn cần đưa những tệp âm thanh đã duyệt vào <code>public/audio-approved/</code> trên GitHub và cập nhật <code>manifest.json</code>. Mã nguồn có hướng dẫn. Tệp thu trên Chrome thường là WebM, không tự biến thành MP3; cần chuyển định dạng trước khi đưa vào thư mục MP3.</p>
- <label class="speed-label" for="speed">Tốc độ nghe: <span id="speedValue">${Math.round(state.speed*100)}%</span></label><input id="speed" type="range" min="0.8" max="1.1" step="0.05" value="${state.speed}"></section>
- <section class="parent-panel"><h2>💾 Sao lưu tiến độ</h2><p>Mỗi thiết bị lưu tiến độ riêng. Khi đổi điện thoại, ba mẹ có thể chuyển tệp JSON; chưa có đồng bộ đám mây.</p><div class="parent-buttons"><button class="btn-outline" data-action="backup">⬇️ Sao lưu</button><label class="upload">⬆️ Khôi phục <input id="restore" type="file" accept=".json,application/json" hidden></label></div></section>
- <section class="parent-panel"><h2>📱 Cài lên điện thoại</h2><p><b>Android:</b> mở địa chỉ HTTPS trên Chrome → menu ⋮ → Thêm vào màn hình chính / Cài đặt ứng dụng.</p><p><b>iPhone/iPad:</b> mở trên Safari → Chia sẻ → Thêm vào màn hình chính.</p><p><b>Windows:</b> mở trên Chrome/Edge → Cài đặt ứng dụng (nếu trình duyệt hỗ trợ).</p></section>
- <div class="version">BÉ VUI HỌC V2.4.1 · Hai bài mẫu: chữ a và đếm 1–3 · Không có tài khoản trực tuyến</div></div></main>`;
-}
-function render(){
- $('#app').innerHTML=screen==='home'?home():screen==='lesson'?lesson():parent();
- if(screen==='lesson'&&lessons[lessonId].steps[stepNum].type==='trace')setupTrace();
-}
-function start(id){if(!lessons[id])return;stopAudio();screen='lesson';lessonId=id;stepNum=0;solved=true;feedback='';render();playClip(lessons[id].steps[0].say);window.scrollTo(0,0)}
-function next(){
- const L=lessons[lessonId],s=L.steps[stepNum];if(['choose','trace'].includes(s.type)&&!solved)return;
- if(stepNum+1>=L.steps.length)return;
- stepNum++;solved=!['choose','trace'].includes(L.steps[stepNum].type);feedback='';traced=0;
- if(L.steps[stepNum].type==='done'&&!kid().finished[lessonId]){kid().finished[lessonId]=Date.now();kid().stars+=3;save()}
- stopAudio();render();playClip(L.steps[stepNum].say);window.scrollTo(0,0);
-}
-function answer(index){
- const s=lessons[lessonId].steps[stepNum];if(s.type!=='choose'||solved)return;
- const pick=s.options[index];if(pick==null)return;kid().attempts++;
- if(pick===s.answer){kid().correct++;solved=true;feedback='🌟 Đúng rồi! Cô khen con!'}else feedback='💛 Con nhìn kỹ rồi thử lại nhé!';
- save();render();const el=$(`[data-action="answer"][data-id="${index}"]`);if(el)el.classList.add(pick===s.answer?'good':'try');
- playClip(pick===s.answer?'right':'retry');
-}
-function setupTrace(){
- const c=$('#tracePad');if(!c)return;const rect=c.getBoundingClientRect(),scale=Math.min(devicePixelRatio||1,2);
- c.width=Math.floor(rect.width*scale);c.height=Math.floor(rect.height*scale);
- const ctx=c.getContext('2d');ctx.scale(scale,scale);ctx.lineWidth=15;ctx.strokeStyle='#ec798f';ctx.lineCap='round';ctx.lineJoin='round';let drawing=false,last=null;
- const pos=e=>{const r=c.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}};
- c.addEventListener('pointerdown',e=>{drawing=true;last=pos(e);c.setPointerCapture(e.pointerId);e.preventDefault()});
- c.addEventListener('pointermove',e=>{if(!drawing)return;const p=pos(e);ctx.beginPath();ctx.moveTo(last.x,last.y);ctx.lineTo(p.x,p.y);ctx.stroke();traced+=Math.hypot(p.x-last.x,p.y-last.y);last=p;if(traced>125&&!solved){solved=true;const b=$('[data-action="next"]');if(b)b.disabled=false;}e.preventDefault()});
- c.addEventListener('pointerup',()=>{drawing=false;if(solved)toast('Tô xong rồi! Con bấm Tiếp tục nhé. ⭐')});
- c.addEventListener('pointercancel',()=>drawing=false);
-}
-function homeNow(){stopAudio();screen='home';render();window.scrollTo(0,0)}
-function downloadProgress(){
- const data=JSON.stringify({format:'be-vui-hoc-progress',version:24,created:new Date().toISOString(),data:state},null,2),url=URL.createObjectURL(new Blob([data],{type:'application/json'}));
- const a=document.createElement('a');a.href=url;a.download='be-vui-hoc-tien-do.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);
-}
-async function restoreProgress(f){
- if(!f||f.size>100000)return toast('Tệp tiến độ không hợp lệ.');
- try{const x=JSON.parse(await f.text());if(x.format!=='be-vui-hoc-progress'||!Array.isArray(x.data?.kids)||x.data.kids.length!==2)throw Error('invalid');
-  if(!confirm('Thay thế tiến độ hiện tại của cả hai bé?'))return;
-  localStorage.setItem(KEY,JSON.stringify(x.data));state=load();render();toast('Đã khôi phục tiến độ.');
- }catch{toast('Không đọc được tệp tiến độ.');}
-}
-window.addEventListener('click',e=>{
- const el=e.target.closest('[data-action]');if(!el)return;
- const {action,id}=el.dataset;
- switch(action){
-  case 'kid':state.active=id==='1'?1:0;save();render();break;
-  case 'parent':stopAudio();screen='parent';render();window.scrollTo(0,0);break;
-  case 'home':homeNow();break;
-  case 'start':start(id);break;
-  case 'next':next();break;
-  case 'replay':playClip(lessons[lessonId].steps[stepNum].say);break;
-  case 'audio-test':playClip('welcome');break;
-  case 'tone':playTone();break;
-  case 'record':recordToggle(id);break;
-  case 'voice-download':downloadVoice(id);break;
-  case 'clip':playClip(id);break;
-  case 'answer':answer(Number(id));break;
-  case 'clear-trace':traced=0;solved=false;render();break;
-  case 'repeat':start(lessonId);break;
-  case 'rename':{const s=$(`#kidName${id}`)?.value.trim();if(s){state.kids[Number(id)].name=s.slice(0,24);save();render();toast('Đã đổi tên bé.')}break;}
-  case 'backup':downloadProgress();break;
- }
-});
-window.addEventListener('input',e=>{if(e.target.id==='speed'){state.speed=Number(e.target.value);save();const txt=$('#speedValue');if(txt)txt.textContent=Math.round(state.speed*100)+'%';if(!audio.paused)audio.playbackRate=state.speed;}});
-window.addEventListener('change',e=>{if(e.target.id==='restore')restoreProgress(e.target.files[0]);
-  if(e.target.dataset.voiceId)saveVoiceFile(e.target.dataset.voiceId,e.target.files[0]);
-  if(e.target.id==='voiceMode'){voiceMode=e.target.value;localStorage.setItem(VOICE_PREF_KEY,voiceMode);stopAudio();render()}});
-window.addEventListener('pagehide',stopAudio);
+function taskView(L,s){if(s.type==='show')return `<div class="activity-intro">👀 Con nhìn lên bảng và nghe cô nhé!</div>`;
+ if(s.type==='choose')return `<div class="choices" role="group" aria-label="Các đáp án">${s.options.map((o,i)=>`<button data-act="answer" data-id="${i}" class="answer" ${solved?'disabled':''}>${esc(o)}</button>`).join('')}</div><div class="feedback" id="feedback" aria-live="polite"></div>`;
+ if(s.type==='trace')return `<div class="trace-info"><span>✍️ Dùng ngón tay tô theo nét</span><button data-act="clear">↺ Xóa nét</button></div><div class="feedback" id="feedback">Con tô chậm thôi nhé!</div>`;return '';}
+function learning(){const L=allLessons[currentId],s=L.steps[pos],done=s.type==='done';return `<main class="lesson"><div class="lesson-shell"><header class="lesson-top"><button data-act="home" class="home-back" aria-label="Về lớp">🏠</button><div class="progress" aria-label="Bước ${pos+1}/${L.steps.length}">${L.steps.map((_,i)=>`<i class="${i<pos?'completed':i===pos?'current':''}"></i>`).join('')}</div><span class="lesson-count">${pos+1}/${L.steps.length}</span></header><section class="learning-stage"><div class="talk-row"><img class="portrait" src="./teacher.svg" alt="Cô giáo"><div class="talk">${esc(s.say)}</div></div><div class="board"><div class="board-label">${esc(s.title)}</div>${boardView(L,s)}</div>${done?`<div class="end-block"><div class="giant-star">⭐⭐⭐</div><h1>Con giỏi lắm!</h1><p>Cô khen con đã cố gắng học bài này 💛</p><button class="btn-next" data-act="home">🏡 Về lớp học</button><button class="btn-outline" data-act="repeat">↺ Học lại bài</button></div>`:`<div class="task-area">${taskView(L,s)}</div><div class="controls"><button class="btn-listen" data-act="replay">🔊 Nghe cô</button><button class="btn-next" data-act="next" ${!solved?'disabled':''}>${pos===L.steps.length-2?'Nhận sao ⭐':'Tiếp tục ➜'}</button></div>`}<div class="sound-status" id="audioStatus" aria-live="polite" role="status"></div></section></div></main>`;}
+function parent(){return `<main class="parent"><div class="parent-page"><button class="btn-outline" data-act="home">← Về lớp học</button><h1>👨‍👩‍👧‍👦 Góc dành cho ba mẹ</h1><p>Quản lý tiến độ của hai bé. Bé không cần sử dụng mục này.</p><section class="parent-panel"><h2>Hai hồ sơ riêng</h2>${state.kids.map((k,i)=>`<div class="parent-kid"><label for="nm${i}">${i?'🐰':'🐣'} Bé ${i+1}</label><input id="nm${i}" type="text" maxlength="28" value="${esc(k.name)}"><button data-act="rename" data-id="${i}">Lưu tên</button><p>⭐ ${k.stars} sao · ${Object.keys(k.finished).length} bài hoàn thành · ${k.correct}/${k.attempts} câu chọn đúng lần đầu hoặc thử lại</p></div>`).join('')}</section><section class="parent-panel"><h2>🔊 Âm thanh cô giáo</h2><p>Bản V2.5 sử dụng các MP3 có sẵn cho bài chữ a và hoạt động đếm mẫu, đã điều chỉnh tốc độ và âm lượng. Những bài mở rộng dùng giọng tiếng Việt của thiết bị khi có. Không cần ba mẹ thu âm hoặc nhập khóa API.</p><button class="btn-next" data-act="sound">🔊 Nghe thử lời chào</button><div id="audioStatus" class="sound-status" role="status" aria-live="polite"></div><label class="speed-label" for="speed">Tốc độ đọc MP3: <b id="speedValue">${Math.round(state.speed*100)}%</b></label><input type="range" id="speed" min="0.8" max="1.1" value="${state.speed}" step="0.05"><p class="help-note"><b>Giới hạn cần biết:</b> MP3 là giọng tổng hợp cũ được xử lý chậm hơn, chưa qua giáo viên kiểm duyệt phát âm. Các bài mới chưa có bản ghi âm chuẩn riêng. Không sử dụng bài này để đánh giá phát âm của trẻ.</p></section><section class="parent-panel"><h2>📚 Tiến độ học</h2><p>Ứng dụng ghi nhận bài đã học, không xếp hạng hoặc so sánh hai bé.</p>${state.kids.map((k,i)=>`<div class="parent-kid"><strong>${esc(k.name)}</strong><p>${Object.keys(k.finished).length}/${ids().length} bài khám phá · Hoàn thành gần nhất: ${Object.entries(k.finished).sort((a,b)=>Number(b[1])-Number(a[1])).slice(0,3).map(([id])=>esc(allLessons[id]?.label||id)).join(', ')||'Chưa có'}</p></div>`).join('')}</section><section class="parent-panel"><h2>💾 Sao lưu / khôi phục</h2><p>Dữ liệu lưu trong thiết bị này. Chưa đồng bộ đám mây. Ba mẹ có thể xuất file JSON để chuyển máy.</p><div class="parent-buttons"><button class="btn-outline" data-act="backup">⬇️ Sao lưu</button><label class="upload">⬆️ Khôi phục <input id="restore" type="file" accept=".json,application/json" hidden></label></div></section><section class="parent-panel"><h2>📱 Dùng trên điện thoại</h2><p>Android: mở bằng Chrome → ⋮ → Cài ứng dụng. iPhone/iPad: Safari → Chia sẻ → Thêm vào màn hình chính. Windows: Chrome/Edge.</p></section><p class="version">BÉ VUI HỌC V2.5 · Trải nghiệm học tại nhà · Chưa có AI hội thoại hoặc đồng bộ dữ liệu</p></div></main>`;}
+function render(){const el=$('#app');el.innerHTML=page==='home'?home():page==='category'?categoryView():page==='lesson'?learning():parent();if(page==='lesson'&&allLessons[currentId].steps[pos].type==='trace')initTrace();}
+function chooseKid(i){stopVoice();state.active=i===1?1:0;save();render();}
+function start(id){if(!allLessons[id])return;stopVoice();currentId=id;page='lesson';pos=0;solved=true;mistakes=0;traceDist=0;render();scrollTo(0,0);const s=allLessons[currentId].steps[0];speak(s.say,s.mp3);}
+function next(){const L=allLessons[currentId],s=L.steps[pos];if(!solved)return;if(pos>=L.steps.length-1)return;stopVoice();pos++;const t=L.steps[pos];solved=t.type!=='choose'&&t.type!=='trace';mistakes=0;traceDist=0;if(t.type==='done'&&!kid().finished[currentId]){kid().finished[currentId]=Date.now();kid().stars+=3;kid().activity.push({id:currentId,date:new Date().toISOString()});save();}render();scrollTo(0,0);speak(t.say,t.mp3);}
+function selected(index){const s=allLessons[currentId].steps[pos];if(s.type!=='choose'||solved||index<0||index>=s.options.length)return;const yes=String(s.options[index])===String(s.answer);kid().attempts++;if(yes){kid().correct++;solved=true;}else mistakes++;save();const btn=$(`[data-act="answer"][data-id="${index}"]`);if(btn)btn.classList.add(yes?'good':'try');const fb=$('#feedback');if(fb)fb.textContent=yes?'🌟 Đúng rồi! Giỏi lắm!':mistakes>1?`💛 Con thử chọn ô có ${s.answer} nhé!`:'💛 Con nhìn kỹ và thử lại nhé!';if(yes){document.querySelectorAll('.answer').forEach(b=>b.disabled=true);const nextBtn=$('[data-act="next"]');if(nextBtn)nextBtn.disabled=false;}speak(yes?'Giỏi lắm! Con làm đúng rồi!':'Con thử lại nhé!',yes?'right':'retry');}
+function initTrace(){const c=$('#tracePad');if(!c)return;const r=c.getBoundingClientRect(),ratio=Math.min(2,devicePixelRatio||1);c.width=Math.round(r.width*ratio);c.height=Math.round(r.height*ratio);const ctx=c.getContext('2d');ctx.scale(ratio,ratio);ctx.strokeStyle='#eb7f9b';ctx.lineWidth=17;ctx.lineCap='round';ctx.lineJoin='round';let down=false,last=null;const xy=e=>({x:e.clientX-c.getBoundingClientRect().left,y:e.clientY-c.getBoundingClientRect().top});c.onpointerdown=e=>{down=true;last=xy(e);c.setPointerCapture(e.pointerId);e.preventDefault()};c.onpointermove=e=>{if(!down)return;const p=xy(e);ctx.beginPath();ctx.moveTo(last.x,last.y);ctx.lineTo(p.x,p.y);ctx.stroke();traceDist+=Math.hypot(p.x-last.x,p.y-last.y);last=p;if(traceDist>140&&!solved){solved=true;const b=$('[data-act="next"]');if(b)b.disabled=false;const f=$('#feedback');if(f)f.textContent='⭐ Cô khen con đã tập tô!'}e.preventDefault()};c.onpointerup=()=>down=false;c.onpointercancel=()=>down=false;}
+function homeNow(){stopVoice();page='home';render();scrollTo(0,0);}
+function backup(){const json=JSON.stringify({format:'be-vui-hoc-progress',version:25,created:new Date().toISOString(),data:state},null,2);const url=URL.createObjectURL(new Blob([json],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='Be_Vui_Hoc_tien_do.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1200);}
+async function restore(file){if(!file||file.size>200000)return toast('File không hợp lệ.');try{const x=JSON.parse(await file.text());if(x.format!=='be-vui-hoc-progress'||!Array.isArray(x.data?.kids)||x.data.kids.length!==2)throw Error('format');if(!confirm('Thay thế tiến độ của hai bé đang lưu trong máy?'))return;localStorage.setItem(KEY,JSON.stringify(x.data));state=readState();render();toast('Đã khôi phục tiến độ của hai bé.')}catch{toast('Không thể khôi phục file này.')}}
+window.addEventListener('click',e=>{const btn=e.target.closest('[data-act]');if(!btn)return;const {act,id}=btn.dataset;switch(act){case 'home':homeNow();break;case 'kid':chooseKid(Number(id));break;case 'start':start(id);break;case 'category':stopVoice();section=id;page='category';render();scrollTo(0,0);break;case 'next':next();break;case 'replay':{const s=allLessons[currentId].steps[pos];speak(s.say,s.mp3);break;}case 'answer':selected(Number(id));break;case 'clear':traceDist=0;solved=false;render();break;case 'repeat':start(currentId);break;case 'parent':stopVoice();page='parent';render();scrollTo(0,0);break;case 'rename':{const value=$(`#nm${id}`)?.value?.trim();if(value){state.kids[Number(id)].name=value.slice(0,28);save();render();toast('Đã lưu tên bé.')}break;}case 'backup':backup();break;case 'sound':speak('Xin chào con! Hôm nay cô trò mình cùng học nhé!','welcome');break;}});
+window.addEventListener('input',e=>{if(e.target.id==='speed'){state.speed=Number(e.target.value);save();const v=$('#speedValue');if(v)v.textContent=Math.round(state.speed*100)+'%';if(!audio.paused)audio.playbackRate=state.speed;}});
+window.addEventListener('change',e=>{if(e.target.id==='restore')restore(e.target.files[0])});window.addEventListener('pagehide',stopVoice);
 render();
-readLocalClips(); loadApprovedManifest();
-if('serviceWorker' in navigator&&location.protocol==='https:')window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+if('serviceWorker'in navigator&&location.protocol==='https:')window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
 })();

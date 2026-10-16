@@ -1,64 +1,47 @@
-# BÉ VUI HỌC V2.4.1 — Sửa nguồn âm thanh (Web/Mobile PWA)
+# BÉ VUI HỌC V2.5 — Web + Mobile (PWA)
 
-## Vì sao V2.4 vẫn nghe khó hiểu?
+Một **ứng dụng web đa nền tảng** dành cho hai bé mầm non chuẩn bị vào lớp 1. Chạy được trên Android, iPhone/iPad và Windows từ cùng **một đường link HTTPS**. Có thể thêm vào màn hình chính như app PWA. Không phải file APK hay ứng dụng phát hành trên kho ứng dụng.
 
-Bản V2.4 chứa 22 MP3 tổng hợp thử nghiệm chưa được duyệt chất lượng tiếng Việt. File có thể phát được nhưng tiếng đọc không rõ, đặc biệt không đủ tin cậy để dạy trẻ cách phát âm. Việc đổi trình duyệt hoặc dùng HTTPS không thể sửa được nội dung âm thanh bị lỗi. **V2.4.1 đã loại bỏ bộ giọng cũ khỏi bài học.**
+## Cách cập nhật repository GitHub `be-vui-hoc` (Cloudflare Pages)
 
-## V2.4.1 có gì mới?
+1. **Giải nén ZIP**, tải thư mục `public` và các file ở gốc lên repository GitHub, chọn **Commit changes**. Khi GitHub hỏi có ghi đè file cũ, chọn ghi đè. Nếu công cụ web không cho ghi đè cả thư mục, hãy cập nhật lần lượt nội dung `public/` (đặc biệt `index.html`, `app.js`, `styles.css`, `sw.js`, `audio/`), hoặc dùng GitHub Desktop để đồng bộ.
+2. Không cần upload `.github` nếu đã dùng **Cloudflare Pages**; thư mục có dấu chấm đầu tên có thể bị ẩn trong hộp chọn file của Windows.
+3. Cloudflare Pages > kết nối GitHub `be-vui-hoc` > **Build output directory = `public`**, framework None, build command trống. Chờ Cloudflare triển khai commit mới.
+4. Mở link `*.pages.dev` bằng **Chrome** trên Android, **Safari** trên iPhone. Nếu từng cài bản V2.4, hãy tải lại trang; nếu vẫn hiện bản cũ, xóa dữ liệu website hoặc xóa PWA cũ rồi mở lại link HTTPS. **Lưu ý sao lưu tiến độ trước khi xóa dữ liệu.**
 
-- Mục **Ba mẹ → Phòng thu giọng cô giáo**, hiển thị đủ 22 câu cần đọc. Có thể **Ghi âm** trực tiếp trên Chrome qua HTTPS, hoặc **Chọn tệp** từ thiết bị, **Thử nghe**, và **Tải lại** file đã ghi.
-- File ghi được lưu bằng IndexedDB trên từng thiết bị. Chưa đồng bộ lên đám mây; không gửi giọng của bé đi đâu.
-- Phân biệt kiểm tra **🔔 chuông** (loa, trình phát, mạng) với **👩‍🏫 lời cô** (chất lượng và tính đầy đủ bản ghi).
-- Chế độ phụ tùy chọn sử dụng giọng tiếng Việt của trình duyệt, chỉ dùng khi ba mẹ nghe thử và thấy rõ.
-- Service Worker đổi phiên bản cache, **không còn tự dùng 22 tệp MP3 cũ**. Các bản MP3 đã được duyệt có thể được cập nhật riêng.
+## Những gì có trong V2.5
 
-**Giới hạn thẳng thắn:** bản ZIP này **chưa chứa giọng nữ Việt chuẩn**. Chỉ có một tiếng chuông để kiểm tra đường truyền/phát âm thanh. Khi chưa thêm giọng đủ chất lượng, app sẽ thông báo rõ thay vì nói khó hiểu. Đây chưa phải giải pháp hoàn thiện cô giáo AI.
+- Giao diện lớp học sáng, hình cô giáo hoạt hình, nút lớn, phù hợp trẻ chưa đọc tốt.
+- Hai hồ sơ độc lập; đổi tên trong **Ba mẹ**, sao thưởng, thống kê, sao lưu/khôi phục dữ liệu JSON.
+- Hoạt động tương tác: quan sát → nghe mẫu nếu có giọng → chọn đáp án → tô chữ/số → ôn tập → khen thưởng.
+- 29 chữ cái tiếng Việt dưới dạng bài làm quen, các số 0–10, cộng một đơn giản, bốn hình, bốn màu. Nội dung thực hành hỗ trợ chuẩn bị lớp 1, **không thay giáo viên hay thay sách giáo khoa**.
+- Thư viện MP3 đi kèm cho lời chào, bài làm quen **chữ a**, một số bước đếm và lời khen. File đã được làm chậm, cân chỉnh âm lượng để **thử cải thiện độ rõ**.
+- Các câu của bài mở rộng sử dụng **giọng vi-VN của thiết bị** khi có. Nếu không có giọng, ứng dụng thông báo rõ ràng; không phát một đoạn sai nội dung. **Chưa có bộ giọng giảng dạy chuẩn cho toàn bộ bài học.**
+- Chế độ PWA, cache để xem app và bài học đã tải sau khi có kết nối ít nhất một lần. Giọng Web Speech của thiết bị có thể không hoạt động offline.
 
-## Cập nhật repository GitHub hiện có
+## Giới hạn trung thực
 
-Repository hiện có thư mục `public/`, `README.md`, `check-assets.mjs`. Giải nén ZIP và tải **các file/thư mục bên trong**, không tải nguyên ZIP. Khi GitHub hỏi, chọn commit lên `main`.
+**V2.5 chưa phải cô giáo AI hội thoại hai chiều.** Giọng MP3 trong V2.5 vẫn là nguồn tổng hợp thử nghiệm từ bản trước, được xử lý âm lượng/tốc độ, **chưa được giáo viên Tiếng Việt xác minh**. Các chữ cái cần phát âm chuẩn để hướng dẫn trẻ; tuyệt đối không dùng nhận dạng giọng nói tự động để kết luận bé phát âm đúng hay sai. Việc đưa website lên GitHub/Cloudflare **không tự tạo ra giọng mới**.
 
-Các file bắt buộc cần được thay trên GitHub:
+Để có cô giáo nữ tiếng Việt tự nhiên, rõ toàn bộ hàng trăm hoạt động, nhà phát triển cần tích hợp nguồn âm thanh đã tạo và được kiểm duyệt hoặc dịch vụ TTS có chi phí/API được cấu hình **một lần phía máy chủ** (ba mẹ và bé không phải nhập khóa hay thu âm). Phần này chưa được cung cấp trong ZIP và không được mô tả là đã hoàn tất.
 
-```
-public/index.html
-public/app.js
-public/styles.css
-public/sw.js
-public/audio/test-tone.mp3
-public/audio-approved/manifest.json
-public/audio-approved/VOICE_SCRIPTS.md
-README.md
-check-assets.mjs
-```
+Ứng dụng chưa đồng bộ tiến độ giữa các máy: `localStorage` là bộ nhớ riêng trên từng trình duyệt. Nếu bạn sử dụng nhiều thiết bị, dùng sao lưu/khôi phục cho đến khi có backend dữ liệu.
 
-Có thể giữ nguyên `public/scene.svg`, `public/teacher.svg`, `public/icons/` và các file PWA khác. Các MP3 cũ trong `public/audio/` có thể xóa sau, vì V2.4.1 không tham chiếu đến chúng. Thư mục `.github` **không bắt buộc** nếu bạn triển khai qua Cloudflare Pages kết nối GitHub.
+## Cấu trúc
 
-Trong Cloudflare Pages, giữ Framework `None`, build output `public`. Sau khi Cloudflare báo deploy thành công, trên điện thoại **đóng app/tab cũ rồi tải lại hai lần** để cập nhật Service Worker. Kiểm tra góc Ba mẹ thấy **V2.4.1** ở cuối trang trước khi thử.
-
-## 3 cách có giọng cô rõ
-
-**A. Ghi âm trực tiếp (dễ thử nhất):** mở web đã triển khai HTTPS bằng Chrome trên Android, vào **Ba mẹ → Phòng thu giọng cô giáo**, chọn từng câu, bấm Ghi âm → Dừng ghi → Thử nghe. App lưu bản ghi ngay trên thiết bị đó. Nếu thu trực tiếp bằng Android Chrome, có thể tạo WebM (không phải MP3), nhưng app vẫn phát được trên máy đó.
-
-**B. Nhập giọng thu/tổng hợp đã được duyệt:** chọn file MP3, M4A, WAV hoặc WebM phù hợp từng câu. Chất lượng phát âm phải được người lớn kiểm tra. Các bản ghi trong IndexedDB không tự chuyển sang thiết bị khác.
-
-**C. Đồng bộ bộ MP3 đã được duyệt qua GitHub (cho mọi thiết bị):** đặt đúng 22 tệp MP3 tại `public/audio-approved/<id>.mp3` và thay `public/audio-approved/manifest.json` từ `{}` thành object đánh dấu từng file đã duyệt, ví dụ:
-
-```json
-{"welcome": true, "vi0": true, "vi1": true}
+```text
+public/index.html             Điểm vào web
+public/app.js                 Bài học tương tác, hai hồ sơ, âm thanh
+public/styles.css             Giao diện responsive light
+public/scene.svg              Tranh lớp học
+public/teacher.svg            Nhân vật cô giáo
+public/audio/*.mp3            Giọng demo đã xử lý lại (22 tệp)
+public/icons/                 Biểu tượng PWA
+public/manifest.webmanifest   PWA
+public/sw.js                  Offline cache và làm mới phiên bản
+.github/workflows/pages.yml   (Tùy chọn) GitHub Pages
 ```
 
-Chỉ bật `true` khi file thực sự tồn tại **và đã được nghe kiểm tra rõ tiếng Việt**. Xem `public/audio-approved/VOICE_SCRIPTS.md` để biết từng câu. Khi bạn upload file âm thanh lên repository **công khai**, ai truy cập website cũng có thể tải file đó. Không dùng giọng người thật khi chưa được người đó đồng ý công khai.
+## Quyền riêng tư
 
-**Dùng dịch vụ AI TTS chuyên nghiệp** là hướng mở rộng hợp lý, nhưng cần một nhà cung cấp/API hỗ trợ tiếng Việt và có thể phát sinh phí. Để tránh lộ khóa API, không bao giờ đưa khóa vào `public/` hay repository công khai. Mã V2.4.1 chưa tự kết nối dịch vụ TTS này.
-
-## Kiểm tra nhanh
-
-1. Mở website HTTPS bằng Chrome trên điện thoại. Bấm `🔔 Kiểm tra loa`. Nếu có tiếng chuông là loa và trình phát đang hoạt động.
-2. Bấm `👩‍🏫 Thử nghe giọng cô`. Khi chưa có file được duyệt, ứng dụng báo thiếu bản ghi; đây là hành vi chủ ý để không tiếp tục dạy trẻ bằng giọng lỗi.
-3. Vào `Ba mẹ` → Ghi âm câu `welcome`, bấm `Thử nghe`. Nếu nghe rõ giọng vừa ghi, luồng phát và lưu file đã hoạt động trên thiết bị đó.
-4. Nếu dùng giọng trình duyệt, chọn nguồn giọng ở `Ba mẹ`, thử lời chào và chỉ tiếp tục nếu nghe rõ.
-
-## Các thành phần giữ nguyên
-
-Hai hồ sơ tiến độ riêng, hai bài mẫu Tiếng Việt/Toán, thưởng sao, tập tô, giao diện sáng và PWA. Chưa có hội thoại AI hai chiều. Tiến độ hai bé lưu localStorage trên từng thiết bị. Giọng ghi âm riêng lưu IndexedDB.
+Chưa có tài khoản hoặc máy chủ dữ liệu. Tên và thành tích của hai bé được lưu trên thiết bị, không gửi về backend. Trẻ không cần cung cấp hình ảnh hoặc bản ghi âm. Không nhập dữ liệu nhạy cảm vào repository GitHub công khai.

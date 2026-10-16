@@ -16,14 +16,15 @@
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
 /* Request light rendering even when browser/OS is set to dark. Some proprietary browsers may override this anyway. */
 @media(prefers-color-scheme:dark){:root,html,body,#app{color-scheme:only light!important;background:#fff6dc!important;color:#342f56!important}}
-
-/* Góc ghi âm dành cho phụ huynh — V2.4.1 */
-.voice-mode{display:block;max-width:100%;width:100%;margin:8px 0 15px;border:2px solid #cfc3ec;border-radius:13px;padding:13px;background:#fff!important;color:#493665;font-weight:800;font-size:16px}
-.voice-list{max-height:540px;overflow:auto;border:2px solid #ede1ef;border-radius:17px;padding:4px;margin-top:11px}
-.voice-item{padding:13px 9px;border-bottom:1px solid #eee6ed}
-.voice-item:last-child{border-bottom:0}
-.voice-script{display:grid;gap:5px;font-size:15px;line-height:1.5}
-.voice-script span{font-weight:600;color:#514761}
-.voice-actions{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
-.voice-actions .btn-outline,.voice-actions .upload{font-size:13px;min-height:42px;padding:10px 12px}
-.parent-panel h3{margin:16px 0 4px;font-size:18px}
+/* v2.5 friendly child-first catalog and accessible training experience */
+:root,html,body,#app{color-scheme:only light!important}
+.home-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;margin:14px 0 8px}
+.lesson-header{font-size:clamp(20px,4.8vw,27px);line-height:1.3;margin:22px 0 8px;color:#524264}
+.lesson-tile{border:3px solid #fff;border-radius:27px;min-height:138px;display:flex;align-items:center;justify-content:center;flex-direction:column;box-shadow:0 6px 0 #e7d8da;padding:12px;gap:6px;color:#4b426a}
+.lesson-tile>span{font-size:42px}.lesson-tile strong{font-size:clamp(20px,4.5vw,26px)}.lesson-tile small{font-size:13px;font-weight:750;color:#665d79}.lesson-tile.lavender{background:#e7ddff!important}.lesson-tile.green{background:#d2f3df!important}.lesson-tile.peach{background:#ffe3cf!important}.lesson-tile.sky{background:#d8efff!important}
+.home-stats{display:flex;gap:11px;justify-content:center;align-items:center;margin:17px 0 2px;flex-wrap:wrap}.home-stats span{font-weight:850;color:#6c588b;background:#fff!important;border-radius:22px;padding:10px 15px;box-shadow:0 3px 10px #987ba021}
+.short-note{text-align:center;color:#8c7c87;font-size:13px;line-height:1.6;padding-bottom:16px}
+.list-head{display:flex;align-items:center;gap:15px;margin:5px 0 17px}.list-head h1{font-size:clamp(25px,5vw,36px);color:#4c416e;line-height:1.25;margin:0}.list-head p{color:#716a7c;font-size:14px;margin:6px 0 0}.module-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(135px,1fr));gap:12px}.module{background:#fff!important;box-shadow:0 5px 0 #eadce4;border:3px solid #f6eaf0;border-radius:23px;min-height:150px;display:flex;flex-direction:column;gap:6px;align-items:center;justify-content:center;padding:10px;color:#514269}.module-emoji{font-size:51px;color:#e27989;font-weight:900;line-height:1.15}.module strong{font-size:20px}.module small{font-size:12px;color:#86788b;font-weight:750}.completed-mark{font-size:11px;color:#41866d;font-weight:900}.catalog-help{color:#7c6983;line-height:1.55;font-size:13px;margin:26px 5px 10px}
+.huge-picture{font-size:clamp(100px,26vw,140px);line-height:1.38}.count-pics{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:5px;font-size:clamp(30px,8vw,53px);max-width:420px;line-height:1.35}.count-pics span{display:inline-block}.empty-objects{font-size:20px;color:#867a83}.math-visual{display:flex;justify-content:center;align-items:center;gap:11px;font-size:clamp(30px,8vw,57px);flex-wrap:wrap}.math-visual>b{font-size:36px;color:#73609f}
+.giant-star{font-size:62px;line-height:1.3}.sound-error{color:#ad513a!important;font-weight:800}.answer{font-size:clamp(23px,6.6vw,54px)}.btn-enter{min-height:97px}
+@media(max-width:380px){.module-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.module{min-height:138px}.module-emoji{font-size:44px}}
