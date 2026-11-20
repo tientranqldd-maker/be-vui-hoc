@@ -1,6 +1,6 @@
 /* BÉ VUI HỌC V2.5 – offline PWA with reliable update behavior */
-const CACHE='be-vui-hoc-shell-v25-20261016';
-const SHELL=['./','./index.html','./styles.css?v=25','./app.js?v=25','./scene.svg','./teacher.svg','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png'];
+const CACHE='be-vui-hoc-shell-v26-english-20261120';
+const SHELL=['./','./index.html','./english.html','./styles.css?v=26','./app.js?v=26','./scene.svg','./teacher.svg','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png'];
 const VOICES='welcome vi0 vi1 vi2 vi3 vi4 vi5 vi6 viDone a cam right retry traceDone math0 math1 math2 math3 math4 math5 mathDone bye'.split(' ').map(x=>`./audio/${x}.mp3?v=25`);
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(c=>c.addAll([...SHELL,...VOICES])).then(()=>self.skipWaiting())));
 self.addEventListener('activate',event=>event.waitUntil(Promise.all([caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('be-vui-hoc-')&&k!==CACHE).map(k=>caches.delete(k)))),self.clients.claim()])));
