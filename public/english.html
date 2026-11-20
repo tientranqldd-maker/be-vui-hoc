@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="vi" style="color-scheme:only light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#fff4d6">
+<meta name="description" content="Trò chơi nghe và nói tiếng Anh cho bé 4–6 tuổi trong Bé Vui Học.">
+<title>Tiếng Anh vui – Bé Vui Học</title>
+<link rel="icon" href="./icons/icon-192.png">
+<link rel="manifest" href="./manifest.webmanifest">
+<style>
+:root{font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif;color-scheme:only light;color:#382b57;background:#fff4d6}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:linear-gradient(160deg,#fff3db,#ecf9fc 70%,#f8ebff)}button,a{font:inherit;touch-action:manipulation}button{cursor:pointer;border:0}a{color:inherit;text-decoration:none}
+button:focus-visible,a:focus-visible{outline:4px solid #2976be;outline-offset:3px}
+button:disabled{opacity:.6;cursor:default}#app{max-width:920px;margin:auto;padding:12px 14px 34px;min-height:100vh}
+.topbar{display:flex;align-items:center;gap:10px;justify-content:space-between;margin-bottom:13px}
+.back{display:inline-flex;align-items:center;justify-content:center;min-width:51px;min-height:51px;padding:10px;background:#fff;border:2px solid #e5dce9;border-radius:18px;font-size:23px;font-weight:900;box-shadow:0 4px 0 #e9d8df}
+.brand{font-size:clamp(19px,4vw,27px);font-weight:1000;letter-spacing:-.03em;flex:1;text-align:center}.kid-bubble{display:flex;align-items:center;gap:6px;border-radius:30px;padding:9px;background:#fff;border:2px solid #e5dcf0;font-weight:850;font-size:14px}
+h1,h2,h3,p{margin:0}.hint{color:#6f6681;font-size:14px;line-height:1.55}.hero{background:linear-gradient(145deg,#d8f7ff,#fff5cc 75%);border:5px solid #fff;border-radius:30px;padding:clamp(20px,5vw,34px);box-shadow:0 9px 0 #eadbd4,0 16px 28px #70668f19;text-align:center;overflow:hidden}
+.eyebrow{font-weight:900;color:#8672a6;text-transform:uppercase;letter-spacing:.08em;font-size:12px;margin-bottom:9px}.hero h1{font-size:clamp(28px,6vw,44px);line-height:1.2}.hero p{line-height:1.6;margin:10px auto;max-width:560px;font-weight:700}
+.actors{min-height:153px;display:flex;align-items:center;justify-content:center;gap:clamp(12px,5vw,45px);margin:12px 0 4px}.actor{font-size:clamp(60px,16vw,110px);display:inline-block;filter:drop-shadow(0 7px 2px #6677a31c);animation:float 3.5s ease-in-out infinite alternate}.actor:nth-child(2){animation-delay:.5s}.actor:nth-child(3){animation-delay:1s}
+@keyframes float{to{transform:translateY(-9px) rotate(3deg)}}.worlds{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:19px}
+.world{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;border:4px solid #fff;padding:15px 10px;background:#fff9e7;border-radius:27px;box-shadow:0 6px 0 #e5d9d9;min-height:185px;color:#453566}
+.world:nth-child(2){background:#e9f9ee}.world:nth-child(3){background:#f4ecff}.world .big{font-size:66px;line-height:1.2}.world strong{font-size:clamp(19px,3vw,24px)}.world small{font-weight:750;color:#716788}.done{font-size:12px;font-weight:900;color:#27794e;background:#d7f7df;border-radius:15px;padding:4px 10px}
+.footnote{text-align:center;margin:22px auto;color:#7b6e84;font-size:13px;line-height:1.55;max-width:650px}
+.primary{display:inline-flex;align-items:center;justify-content:center;gap:7px;background:#7656cf;color:white;min-height:62px;border-radius:19px;padding:13px 25px;font-size:clamp(19px,4vw,24px);font-weight:950;box-shadow:0 5px 0 #51378b}
+.primary:disabled{box-shadow:none;background:#bcb0d1}.soft{background:#e5f5ff;color:#2b608a;border:2px solid #b7d7ea;min-height:54px;border-radius:17px;padding:10px 15px;font-size:16px;font-weight:900}
+.large{font-size:21px;min-height:70px;width:min(380px,100%)}.intro-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:25px}
+.story{background:#fff;border:5px solid #f5e8cf;border-radius:30px;padding:clamp(18px,4vw,28px);text-align:center;box-shadow:0 8px 23px #6e52731a}
+.story h1{font-size:clamp(29px,6vw,43px);margin:10px 0}.story .english{font-weight:1000;font-size:clamp(22px,5.5vw,37px);color:#514192;line-height:1.36;margin:9px 0}
+.scene{position:relative;min-height:240px;border-radius:26px;background:linear-gradient(#bfeaff 0%,#ddf8fb 67%,#bfeac2 68%,#93cf9e 100%);overflow:hidden;display:flex;align-items:center;justify-content:space-evenly;isolation:isolate}
+.scene::before{content:"☁️";position:absolute;top:7px;left:12%;font-size:65px;opacity:.86}.scene::after{content:"🌳";position:absolute;bottom:2px;right:3%;font-size:72px;z-index:-1}
+.scene .scene-actor{font-size:clamp(74px,16vw,120px);filter:drop-shadow(0 6px 3px #4b657044)}.scene .decor{font-size:55px;align-self:flex-end;margin-bottom:17px}
+.progress{display:flex;gap:5px;flex:1;max-width:350px}.progress i{height:10px;flex:1;border-radius:20px;background:#e1d8e6}.progress i.passed{background:#61bd95}.progress i.current{background:#8870da}.step-label{font-weight:900;font-size:13px;color:#786e91;white-space:nowrap}
+.task-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:10px 0 15px}.task{border:5px solid white;background:#fffefa;border-radius:30px;box-shadow:0 8px 0 #e7ddce,0 14px 25px #80629d12;padding:clamp(15px,3.5vw,26px);text-align:center}
+.character{font-size:clamp(70px,16vw,100px);line-height:1.25;margin-bottom:5px}.speech{background:#f0ebff;color:#4c3f82;border-radius:23px 23px 23px 8px;padding:14px 12px;max-width:630px;margin:10px auto;font-weight:950;font-size:clamp(22px,5vw,33px);line-height:1.32}
+.speech-sub{font-size:15px;color:#81758f;margin-top:7px;line-height:1.5}
+.play-sound{display:inline-flex;align-items:center;justify-content:center;gap:6px;margin:13px auto 14px;border-radius:20px;min-height:57px;padding:11px 19px;background:#e2f2ff;border:2px solid #afd4ed;color:#255e8a;font-weight:900;font-size:18px}
+.options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px;margin:11px auto 10px;max-width:690px}
+.option{border:4px solid #dfd6f5;border-radius:25px;background:#f6f0ff;padding:12px 5px;min-height:130px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;color:#574475;font-weight:900}
+.option .symbol{font-size:clamp(48px,12vw,79px);line-height:1.22}.option .word{font-size:clamp(13px,3vw,18px)}
+.option.selected{border-color:#59a4d8;background:#e0f4ff}.option.correct{border-color:#46ba83;background:#ddf8e8}.option.wrong{animation:shake .28s}.option:disabled{opacity:1}
+@keyframes shake{20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
+.give-wrap{display:grid;grid-template-columns:1fr;max-width:740px;margin:auto;gap:10px}.drop-zone{display:flex;align-items:center;justify-content:center;gap:14px;border:4px dashed #bba2e8;background:#f4f0ff;border-radius:24px;min-height:120px;font-weight:900;font-size:18px;color:#67538d}.drop-zone .friend{font-size:75px}.drop-zone.ok{background:#dcf8e7;border-color:#50b78b}
+.draggable{touch-action:none}.drag-ghost{position:fixed;pointer-events:none;z-index:100;font-size:70px;transform:translate(-50%,-50%);filter:drop-shadow(0 8px 7px #0003)}
+.feedback{font-weight:950;font-size:18px;min-height:31px;margin:13px auto;color:#428567}.feedback.retry{color:#a56f3a}.next-bar{display:flex;justify-content:center;margin-top:8px}
+.say-prompt{font-size:clamp(35px,8vw,59px);font-weight:1000;color:#8060bd;margin:10px}.say-tools{display:flex;justify-content:center;flex-wrap:wrap;gap:10px;margin:14px 0}.record-state{font-size:14px;color:#786b89;line-height:1.5}
+.recording{background:#fee3ea;color:#9f2f58;border-color:#f6a4b7}.playback{display:block;max-width:100%;width:min(330px,100%);margin:12px auto}
+.reward{font-size:clamp(100px,23vw,170px);margin:3px 0}.sparkle{font-size:46px;letter-spacing:6px;margin:10px 0}
+#notice{min-height:22px;font-size:13px;color:#6d6884;text-align:center;margin:9px auto;line-height:1.5}
+@media(max-width:670px){.worlds{grid-template-columns:1fr 1fr}.world{min-height:165px}.hero{padding:16px}.actors{min-height:100px}.actor{font-size:72px}.scene{min-height:200px}.option{min-height:113px}}
+@media(max-width:410px){.worlds{grid-template-columns:1fr 1fr;gap:9px}.world .big{font-size:51px}.world strong{font-size:18px}.world:last-child{grid-column:1/-1}.topbar{gap:5px}.brand{font-size:19px}.kid-bubble{font-size:12px}.options{gap:6px}.option .symbol{font-size:49px}.scene .scene-actor{font-size:83px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<main id="app"></main>
+<div id="notice" role="status" aria-live="polite"></div>
+<script>
+(function(){
+"use strict";
+var STORE="be-vui-hoc-family-v25";
+var WORLDS=[
+ {id:"hello",name:"Hello, friends!",vn:"Chào bạn mới",icon:"👋",lead:"Mimi gặp người bạn mới trong khu vườn.",line:"Hello! I'm Mimi!",scene:["🐰","🐦"],tasks:[
+  {kind:"tap",s:"🐰",line:"Hello! Wave to Mimi!",vn:"Mimi vẫy tay. Con chào lại nào!",items:[["wave","👋","Hello!"],["apple","🍎","Apple"],["sleep","🌙","Sleep"]],answer:"wave"},
+  {kind:"tap",s:"🐰",line:"Where is Tobi? Tap the bird!",vn:"Tobi là bạn chim. Con tìm Tobi nhé!",items:[["rabbit","🐰","Mimi"],["bird","🐦","Tobi"],["elephant","🐘","Ellie"]],answer:"bird"},
+  {kind:"say",s:"🐦",line:"Hello! I'm Tobi!",vn:"Con thử nói Hello cùng Tobi!",say:"Hello!"}
+ ]},
+ {id:"colors",name:"Color Garden",vn:"Khu vườn màu sắc",icon:"🎨",lead:"Mimi và Tobi tìm những món đồ nhiều màu.",line:"Look! A red apple!",scene:["🐰","🌈"],tasks:[
+  {kind:"tap",s:"🐰",line:"Find the red apple!",vn:"Chạm vào quả táo đỏ nhé!",items:[["red","🍎","Red"],["blue","🫐","Blue"],["yellow","🍋","Yellow"]],answer:"red"},
+  {kind:"drag",s:"🐰",line:"Give Mimi the blue ball!",vn:"Kéo hoặc chọn bóng xanh, đưa cho Mimi.",items:[["red","🔴","Red"],["blue","🔵","Blue"],["yellow","🟡","Yellow"]],answer:"blue",to:"🐰"},
+  {kind:"tap",s:"🐦",line:"Touch something green!",vn:"Con tìm một thứ màu xanh lá nhé!",items:[["star","⭐","Star"],["leaf","🍃","Leaf"],["heart","❤️","Heart"]],answer:"leaf"}
+ ]},
+ {id:"food",name:"Yummy Picnic",vn:"Bữa ăn ngoài trời",icon:"🍎",lead:"Hai người bạn cùng chuẩn bị một buổi dã ngoại.",line:"I'm hungry! Let's eat!",scene:["🐰","🧺"],tasks:[
+  {kind:"drag",s:"🐰",line:"Give Mimi an apple, please!",vn:"Đưa quả táo cho Mimi nhé!",items:[["apple","🍎","Apple"],["bread","🍞","Bread"],["banana","🍌","Banana"]],answer:"apple",to:"🐰"},
+  {kind:"drag",s:"🐦",line:"Give Tobi a banana, please!",vn:"Đưa quả chuối cho Tobi nhé!",items:[["water","💧","Water"],["banana","🍌","Banana"],["cake","🍰","Cake"]],answer:"banana",to:"🐦"},
+  {kind:"say",s:"🐰",line:"Thank you!",vn:"Nói Thank you! để cảm ơn nhé.",say:"Thank you!"}
+ ]}
+];
+var app=document.getElementById("app");
+var notice=document.getElementById("notice");
+var active=0,phase="home",world=null,step=0,solved=false,selected="",feedback="",wrong="",recorder=null,stream=null,recordUrl="",recording=false,dragging=null;
+function safe(v){return String(v==null?"":v).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+function family(){try{return JSON.parse(localStorage.getItem(STORE)||"null")}catch(e){return null}}
+function getKid(){var s=family();if(s&&Array.isArray(s.kids)&&s.kids.length){active=s.active===1?1:0;return s.kids[active]}return {name:"Bé",finished:{},stars:0}}
+function completed(id){return !!(getKid().finished||{})["en_"+id]}
+function markCompleted(){var s=family();if(!s||!Array.isArray(s.kids)||!s.kids[active])return false;var k=s.kids[active];if(!k.finished||typeof k.finished!=="object")k.finished={};if(k.finished["en_"+world.id])return false;k.finished["en_"+world.id]=new Date().toISOString();k.stars=Math.max(0,Number(k.stars)||0)+3;k.activity=Array.isArray(k.activity)?k.activity:[];k.activity.push({at:new Date().toISOString(),id:"en_"+world.id,kind:"english-game",stars:3});k.activity=k.activity.slice(-250);try{localStorage.setItem(STORE,JSON.stringify(s));return true}catch(e){message("Không lưu được tiến độ. Kiểm tra bộ nhớ của máy.");return false}}
+function message(s){notice.textContent=s||""}
+function header(){var k=getKid();return '<header class="topbar"><a class="back" href="./" aria-label="Về Bé Vui Học">🏠</a><div class="brand">🌈 Tiếng Anh vui</div><span class="kid-bubble">🧒 '+safe(k.name||"Bé")+'</span></header>'}
+function worldButtons(){return WORLDS.map(function(w){return '<button class="world" data-action="world" data-id="'+w.id+'"><span class="big">'+w.icon+'</span><strong>'+safe(w.name)+'</strong><small>'+safe(w.vn)+'</small>'+(completed(w.id)?'<span class="done">✓ Đã chơi</span>':'<small>▶ Chơi ngay</small>')+'</button>'}).join("")}
+function home(){return header()+'<section class="hero"><div class="eyebrow">Bé Vui Học · English Adventure</div><h1>Chơi cùng Mimi & Tobi!</h1><div class="actors" aria-hidden="true"><span class="actor">🐰</span><span class="actor">🐦</span><span class="actor">🐘</span></div><p>Nghe tiếng Anh, giúp các bạn và khám phá những trò chơi trong khu vườn.</p></section><section class="worlds" aria-label="Chọn thế giới trò chơi">'+worldButtons()+'</section><p class="footnote">Nhân vật và nội dung tự sáng tạo, không phải trò chơi chính thức của Muzzy. Giọng tiếng Anh dùng chức năng đọc của thiết bị khi có. Ba mẹ có thể đổi hồ sơ bé ở trang chính.</p>'}
+function startIntro(w){world=w;phase="intro";step=0;solved=false;selected="";feedback="";clearRecord();render()}
+function scene(a){return '<div class="scene" aria-hidden="true"><span class="scene-actor">'+a[0]+'</span><span class="decor">🌼</span><span class="scene-actor">'+a[1]+'</span></div>'}
+function intro(){return header()+'<section class="story"><div class="eyebrow">Một câu chuyện mới</div><h1>'+safe(world.name)+'</h1>'+scene(world.scene)+'<p class="english">'+safe(world.line)+'</p><p class="hint">'+safe(world.lead)+'</p><div class="intro-actions"><button class="soft" data-action="listenIntro">🔊 Nghe nhân vật</button><button class="primary large" data-action="begin">▶ Bắt đầu chơi</button></div></section>'}
+function progress(){var x='';world.tasks.forEach(function(t,i){x+='<i class="'+(i<step?"passed":i===step?"current":"")+'"></i>'});return '<div class="task-head"><button class="back" data-action="exit" aria-label="Chọn màn chơi">←</button><div class="progress" aria-label="Tiến độ">'+x+'</div><span class="step-label">'+(step+1)+' / '+world.tasks.length+'</span></div>'}
+function itemsHtml(t,draggable){return '<div class="options">'+t.items.map(function(it){var cls=(solved&&it[0]===t.answer?" correct ":"")+(selected===it[0]?" selected ":"")+(wrong===it[0]?" wrong ":"");return '<button class="option'+cls+(draggable?" draggable":"")+'" data-action="'+(draggable?"pick":"choose")+'" data-id="'+it[0]+'" '+(solved?"disabled":"")+'><span class="symbol">'+it[1]+'</span><span class="word">'+safe(it[2])+'</span></button>'}).join("")+'</div>'}
+function taskBody(t){if(t.kind==="tap")return itemsHtml(t,false);
+if(t.kind==="drag")return '<div class="give-wrap">'+itemsHtml(t,true)+'<button class="drop-zone'+(solved?" ok":"")+'" data-action="drop" '+(solved?"disabled":"")+'><span class="friend">'+t.to+'</span><span>🎁 Đưa cho bạn ở đây</span></button><p class="hint">Kéo đồ vật vào bạn hoặc chạm đồ vật rồi chạm vào bạn.</p></div>';
+return '<div class="say-prompt">'+safe(t.say)+'</div><p class="hint">Con nghe và nói theo nhé. Không chấm điểm phát âm.</p><div class="say-tools"><button class="soft '+(recording?"recording":"")+'" data-action="'+(recording?"stopRecord":"startRecord")+'">'+(recording?"⏹ Dừng ghi âm":"🎙 Thu giọng con")+'</button><button class="soft" data-action="said">😊 Con đã nói!</button></div>'+(recordUrl?'<audio class="playback" controls src="'+recordUrl+'" aria-label="Nghe giọng con vừa ghi"></audio>':'')+'<p class="record-state">Ghi âm chỉ giữ tạm trong phiên chơi, không tải lên máy chủ. Nếu không cấp quyền micro, bé vẫn chơi được.</p>'}
+function taskPage(){var t=world.tasks[step];return header()+progress()+'<section class="task"><div class="eyebrow">'+safe(world.name)+'</div><div class="character" aria-hidden="true">'+t.s+'</div><div class="speech">'+safe(t.line)+'</div><p class="speech-sub">'+safe(t.vn)+'</p><button class="play-sound" data-action="listen">🔊 Nghe tiếng Anh</button>'+taskBody(t)+'<p class="feedback'+(wrong?" retry":"")+'" role="status">'+safe(feedback)+'</p><div class="next-bar"><button class="primary large" data-action="next" '+(solved?"":"disabled")+'>'+(step===world.tasks.length-1?"🏆 Hoàn thành!":"Tiếp tục ➜")+'</button></div></section>'}
+function finish(){return header()+'<section class="story"><div class="eyebrow">Hooray!</div><div class="reward">🏆</div><h1>Great job!</h1><div class="sparkle" aria-hidden="true">🌟🌈🌟</div><p class="english">You did it!</p><p>Con đã giúp Mimi và Tobi hoàn thành <strong>'+safe(world.vn)+'</strong>.</p><p class="hint">Mỗi thế giới hoàn thành lần đầu được thưởng 3 sao. Chơi lại để nghe và nhớ tự nhiên nhé!</p><div class="intro-actions"><button class="soft" data-action="replay">🔁 Chơi lại</button><button class="primary" data-action="exit">🏡 Chọn màn khác</button></div></section>'}
+function render(){app.innerHTML=phase==="home"?home():phase==="intro"?intro():phase==="play"?taskPage():finish()}
+function speak(line){message("");if(!("speechSynthesis" in window)){message("Thiết bị chưa hỗ trợ giọng đọc tiếng Anh. Bé có thể chơi bằng hình.");return}try{speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(line);u.lang="en-US";u.rate=.84;u.pitch=1.06;var vs=speechSynthesis.getVoices();var v=vs.find(function(v){return /^en[-_]/i.test(v.lang)})||null;if(v)u.voice=v;u.onerror=function(){message("Không mở được giọng tiếng Anh. Kiểm tra giọng đọc trên thiết bị.")};speechSynthesis.speak(u)}catch(e){message("Không mở được giọng đọc trên trình duyệt này.")}}
+function complete(){if(solved)return;solved=true;wrong="";feedback="🌟 Great job! Giỏi lắm!";clearRecord(false);render();speak("Great job!")}
+function answer(id){if(solved)return;var t=world.tasks[step];if(id===t.answer){complete();return}wrong=id;feedback="💛 Let's try again! Con thử lại nhé.";render();speak(t.line)}
+function next(){if(!solved)return;clearRecord();if(step<world.tasks.length-1){step++;solved=false;selected="";wrong="";feedback="";render();speak(world.tasks[step].line)}else{markCompleted();phase="finish";render();speak("Hooray! Great job!")}}
+function clearRecord(revoke){if(recording&&recorder&&recorder.state!=="inactive"){try{recorder.stop()}catch(e){}}if(stream){stream.getTracks().forEach(function(t){t.stop()});stream=null}recording=false;if(revoke!==false){if(recordUrl)URL.revokeObjectURL(recordUrl);recordUrl=""}}
+async function startRecording(){if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia||typeof MediaRecorder==="undefined"){message("Máy chưa hỗ trợ ghi âm. Bé có thể nói và bấm Con đã nói.");return}try{clearRecord();stream=await navigator.mediaDevices.getUserMedia({audio:true});var chunks=[];recorder=new MediaRecorder(stream);recorder.ondataavailable=function(e){if(e.data&&e.data.size)chunks.push(e.data)};recorder.onstop=function(){if(!chunks.length)return;if(recordUrl)URL.revokeObjectURL(recordUrl);recordUrl=URL.createObjectURL(new Blob(chunks,{type:recorder.mimeType||"audio/webm"}));if(phase==="play")render()};recorder.start();recording=true;render();message("🎙 Đang ghi âm. Bấm Dừng khi con nói xong.")}catch(e){clearRecord();message("Chưa có quyền dùng micro. Bé vẫn có thể tập nói bình thường.")}}
+function stopRecording(){if(!recording)return;recording=false;try{if(recorder&&recorder.state!=="inactive")recorder.stop()}catch(e){}if(stream){stream.getTracks().forEach(function(t){t.stop()});stream=null}render()}
+function exitHome(){clearRecord();if("speechSynthesis"in window)speechSynthesis.cancel();world=null;phase="home";render();window.scrollTo(0,0)}
+app.addEventListener("click",function(e){var el=e.target.closest("[data-action]");if(!el)return;var a=el.dataset.action,id=el.dataset.id;
+if(a==="world"){var w=WORLDS.find(function(w){return w.id===id});if(w)startIntro(w)}
+else if(a==="listenIntro")speak(world.line);
+else if(a==="begin"){phase="play";render();speak(world.tasks[0].line)}
+else if(a==="listen")speak(world.tasks[step].line);
+else if(a==="choose")answer(id);
+else if(a==="pick"){if(!solved){selected=id;wrong="";render();message("Đã chọn! Con đưa đồ vật đến bạn nhé.")}}
+else if(a==="drop"){if(selected)answer(selected);else message("Chọn một món đồ trước nhé!")}
+else if(a==="said")complete();
+else if(a==="startRecord")startRecording();
+else if(a==="stopRecord")stopRecording();
+else if(a==="next")next();
+else if(a==="exit")exitHome();
+else if(a==="replay")startIntro(world);
+});
+app.addEventListener("pointerdown",function(e){var el=e.target.closest('[data-action="pick"]');if(!el||solved||e.button!==0)return;dragging={id:el.dataset.id,startX:e.clientX,startY:e.clientY,ghost:null};});
+app.addEventListener("pointermove",function(e){if(!dragging)return;var dx=e.clientX-dragging.startX,dy=e.clientY-dragging.startY;if(!dragging.ghost&&(dx*dx+dy*dy)>144){var g=document.createElement("div");g.className="drag-ghost";var t=world.tasks[step];var item=t.items.find(function(x){return x[0]===dragging.id});g.textContent=item?item[1]:"🎁";document.body.appendChild(g);dragging.ghost=g;}if(dragging.ghost){dragging.ghost.style.left=e.clientX+"px";dragging.ghost.style.top=e.clientY+"px";e.preventDefault()}});
+app.addEventListener("pointerup",function(e){if(!dragging)return;var d=dragging;dragging=null;if(d.ghost){d.ghost.remove();var target=document.elementFromPoint(e.clientX,e.clientY);if(target&&target.closest('[data-action="drop"]')){selected=d.id;answer(d.id)}else{selected=d.id;render();message("Con hãy đưa đồ vật cho bạn nhé.")}}});
+app.addEventListener("pointercancel",function(){if(dragging&&dragging.ghost)dragging.ghost.remove();dragging=null});
+window.addEventListener("pagehide",function(){clearRecord();if("speechSynthesis"in window)speechSynthesis.cancel()});
+render();
+})();
+</script>
+</body>
+</html>
