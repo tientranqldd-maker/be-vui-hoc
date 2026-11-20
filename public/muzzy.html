@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="vi" style="color-scheme:only light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#fff3d4">
+<meta name="description" content="Bé học tiếng Anh cùng phim Muzzy: xem tập phim từ kênh chính thức và chơi trò luyện nghe nói tự sáng tạo.">
+<title>Học cùng phim MUZZY • Bé Vui Học</title>
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./icons/icon-192.png">
+<style>
+:root{font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif;color-scheme:only light;color:#342750;background:#fff7e7}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;min-height:100vh;background:linear-gradient(160deg,#fff0d7 0%,#f5fbf9 45%,#f0edff 100%)}button,input{font:inherit}button,a{touch-action:manipulation}button{border:0;cursor:pointer}button:focus-visible,a:focus-visible{outline:4px solid #247dc4;outline-offset:4px}a{color:inherit;text-decoration:none}button:disabled{cursor:default;opacity:.55}
+#app{max-width:980px;padding:12px clamp(12px,3vw,25px) 35px;margin:auto;min-height:100vh}
+.top{display:flex;align-items:center;gap:9px;margin-bottom:12px;justify-content:space-between}.back{display:grid;place-items:center;min-width:52px;min-height:52px;background:white;border:2px solid #ebe0df;border-radius:19px;font-size:25px;text-decoration:none}.title{flex:1;text-align:center;font-weight:1000;font-size:clamp(18px,4vw,27px);letter-spacing:-.025em}.kid{border-radius:25px;background:#fff;padding:10px;font-size:clamp(12px,3vw,15px);font-weight:800;border:2px solid #e9ddeb;max-width:122px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+h1,h2,h3,p{margin:0}.hero{background:linear-gradient(150deg,#c6ecfc,#e4f9df 70%,#fff7d9);border:5px solid #fff;border-radius:32px;padding:clamp(21px,5vw,35px);text-align:center;box-shadow:0 8px 0 #dfdaca,0 17px 28px #5a557b18}
+.kicker{font-size:12px;letter-spacing:.09em;font-weight:1000;color:#6d618f;text-transform:uppercase}.hero h1{font-size:clamp(36px,8vw,64px);line-height:1.06;letter-spacing:-.045em;color:#375746;margin:8px 0}.hero h1 span{color:#e17a43}
+.illustration{display:flex;align-items:center;justify-content:center;gap:clamp(12px,4vw,36px);min-height:116px;padding:7px}.illustration span{font-size:clamp(58px,13vw,100px);filter:drop-shadow(0 7px 1px #658c8421);animation:rise 2.7s ease-in-out infinite alternate}.illustration span:nth-child(2){animation-delay:.5s}.illustration span:nth-child(3){animation-delay:1s}
+@keyframes rise{to{transform:translateY(-8px) rotate(4deg)}}.hero-desc{max-width:610px;margin:8px auto 16px;font-weight:700;font-size:clamp(15px,3.5vw,19px);line-height:1.5}
+.hero-actions{display:flex;justify-content:center;gap:11px;flex-wrap:wrap}.primary,.secondary{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:20px;padding:14px 20px;min-height:62px;font-weight:950;font-size:clamp(16px,3.8vw,20px)}
+.primary{background:#7a55cf!important;color:white!important;box-shadow:0 5px 0 #5635a0}.secondary{background:white;color:#4b507c;border:2px solid #d9d5ea}.primary:disabled{box-shadow:none;background:#ada2c5!important}
+.notice{font-size:13px;line-height:1.5;color:#796e86;margin:15px auto 0;text-align:center;max-width:650px}
+.panel-title{font-size:clamp(23px,4.5vw,30px);font-weight:1000;line-height:1.25;margin:27px 0 12px}.world-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}
+.world{display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:6px;min-height:170px;padding:15px 9px;border-radius:26px;border:4px solid white;box-shadow:0 6px 0 #ddd6e3;color:#43335d}
+.world:nth-child(6n+1){background:#ffe4dd}.world:nth-child(6n+2){background:#dff5ff}.world:nth-child(6n+3){background:#e6f4d9}.world:nth-child(6n+4){background:#fff2c9}.world:nth-child(6n+5){background:#f4e6ff}.world:nth-child(6n+6){background:#dbf4f0}
+.world .emoji{font-size:clamp(54px,10vw,76px);line-height:1.2}.world strong{font-size:clamp(17px,3vw,22px);line-height:1.25}.world small{color:#6f6384;font-size:12px;font-weight:800;line-height:1.3}
+.world .stamp{border-radius:15px;background:#d0f7d6;color:#237c50;font-size:12px;padding:4px 9px;font-weight:900}
+.info-row{display:flex;justify-content:space-between;gap:10px;align-items:center;margin:15px 0 8px;padding:13px 15px;background:white;border-radius:19px;border:2px solid #eee5ed;font-weight:850;font-size:14px}
+.note{font-size:13px;color:#776d85;line-height:1.6;margin-top:16px}.note a{color:#335ca3;text-decoration:underline}
+.video-card{background:white;border-radius:28px;border:4px solid #f2e6ce;padding:clamp(13px,3vw,23px);box-shadow:0 7px 0 #e7e1d8}
+.video-card h2{font-size:clamp(23px,5vw,32px);margin:0 0 12px}.video-card .vidicon{font-size:60px;text-align:center}.video-card p{line-height:1.65;color:#625977;margin:10px 0 18px;font-size:15px}.video-actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.external{display:inline-flex;align-items:center;justify-content:center;border-radius:17px;background:#e6f2ff;border:2px solid #c4d9ed;padding:12px 17px;font-weight:900;color:#285d89;min-height:55px}
+.video-frame{aspect-ratio:16/9;width:100%;border:0;border-radius:19px;background:#151822;display:block;margin:14px auto}
+.video-foot{font-size:12px!important;color:#857b8b!important;margin:14px 0 3px!important}
+.toolbar{display:flex;align-items:center;gap:10px;margin-bottom:13px}.round{border-radius:18px;min-width:53px;min-height:53px;background:white;border:2px solid #e8dfeb;font-size:23px;font-weight:900;color:#57437b}.progress{display:flex;gap:5px;flex:1}.progress i{height:11px;border-radius:12px;background:#e5dde9;flex:1}.progress .done{background:#6ecba4}.progress .active{background:#9070e1}.count{font-weight:900;color:#766c86;font-size:13px;white-space:nowrap}
+.game{background:#fffefa;border:5px solid white;border-radius:30px;padding:clamp(17px,3.5vw,30px);text-align:center;box-shadow:0 7px 0 #e0d9ce,0 15px 25px #4c346017}
+.game-icon{font-size:clamp(64px,16vw,110px);line-height:1.15;margin:7px auto}.game-label{font-size:13px;text-transform:uppercase;letter-spacing:.07em;font-weight:900;color:#81738d;margin-top:6px}
+.phrase{font-size:clamp(24px,5vw,39px);color:#4f3d86;line-height:1.3;font-weight:1000;background:#f1ecff;padding:14px 10px;border-radius:22px;max-width:750px;margin:12px auto 10px}
+.hint{color:#736b80;font-size:14px;line-height:1.5;margin:6px auto 12px}
+.listen{display:inline-flex;gap:8px;align-items:center;justify-content:center;background:#e3f3ff;border:2px solid #b3d3ed;color:#32678c;border-radius:20px;padding:12px 19px;min-height:57px;font-weight:900;font-size:17px;margin:6px auto 13px}
+.choices{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px;max-width:710px;margin:12px auto}
+.choice{background:#f8efff;border:4px solid #dfccef;border-radius:23px;padding:11px 3px;min-height:120px;color:#4e3b68;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px}
+.choice .visual{font-size:clamp(44px,11vw,83px);line-height:1.16}.choice .name{font-size:clamp(13px,2.8vw,18px);font-weight:900}
+.choice.ok{background:#e1f7e6;border-color:#49bc78}.choice.selected{background:#e9f7ff;border-color:#56a5d8}.choice.retry{animation:shake .22s 2}
+@keyframes shake{20%,60%{transform:translateX(-4px)}40%,80%{transform:translateX(4px)}}.choice:disabled{opacity:1}
+.drop-area{background:#edf8ee;border:4px dashed #84b98e;border-radius:25px;min-height:106px;max-width:610px;margin:12px auto;display:flex;align-items:center;justify-content:center;gap:11px;font-size:20px;font-weight:900;color:#51765a}
+.drop-area .friend{font-size:69px}.drop-area.ok{background:#d4f5de;border-color:#3ebc79}.drag-ghost{position:fixed;z-index:40;pointer-events:none;font-size:67px;transform:translate(-50%,-50%);filter:drop-shadow(0 7px 5px #0003)}
+.feedback{min-height:28px;margin:10px auto 3px;color:#39805b;font-size:18px;font-weight:1000}.feedback.retry{color:#b36b40}
+.actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:11px}
+.say-large{font-size:clamp(29px,7vw,53px);font-weight:1000;color:#7b5ad3;margin:15px 0}.voicebox{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:18px 0}.voicebtn{background:#e5f2ff;border:2px solid #b6d9f0;border-radius:18px;padding:11px 16px;min-height:56px;font-weight:900;color:#316588}.voicebtn.rec{background:#ffe1e9;border-color:#efa9bd;color:#9b4560}.playback{display:block;max-width:350px;width:100%;margin:11px auto}
+.record-note{font-size:12px;color:#7f7189;max-width:580px;line-height:1.6;margin:0 auto}
+.finish{background:white;border:5px solid #fff1d5;border-radius:31px;padding:28px 19px;text-align:center;box-shadow:0 7px 0 #e7dacc}.finish .big{font-size:clamp(105px,23vw,155px)}.finish h1{font-size:clamp(31px,7vw,50px);margin:10px}.finish p{line-height:1.7;margin:12px auto;color:#6e6480}
+#status{min-height:20px;text-align:center;color:#79638a;font-size:13px;margin:12px auto;line-height:1.6}
+@media(max-width:650px){.world-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.hero h1{font-size:43px}.world{min-height:159px}.hero-actions>.primary,.hero-actions>.secondary{width:100%}}
+@media(max-width:380px){.world-grid{gap:8px}.world .emoji{font-size:46px}.world strong{font-size:17px}.choices{gap:6px}.choice .visual{font-size:48px}.top{gap:5px}.kid{max-width:85px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div id="app"></div><div id="status" role="status" aria-live="polite"></div>
+<script>
+(function(){
+'use strict';
+var app=document.getElementById('app'),status=document.getElementById('status');
+var DATA_KEY='be-vui-hoc-family-v25',EXTRA_KEY='be-vui-hoc-muzzy-progress-v1';
+var FILM='https://www.youtube.com/watch?v=Dtl6z4EPZmE';
+var offlineUnits=[
+{id:'hello',label:'Hello!',vi:'Lời chào',icon:'👋',headline:'Hello, my friend!',tasks:[
+{type:'tap',actor:'👧',line:'Hello!',hint:'Khi nghe Hello, con chạm vào lời chào nhé!',choices:[['wave','👋','Hello'],['sleep','😴','Sleep'],['eat','🍽️','Eat']],answer:'wave'},
+{type:'tap',actor:'🐣',line:'Goodbye!',hint:'Tạm biệt bạn nhỏ nào!',choices:[['cry','😭','Cry'],['wave','👋','Goodbye'],['apple','🍎','Apple']],answer:'wave'},
+{type:'give',actor:'🐻',line:'Give me a flower, please!',hint:'Kéo hoặc chọn bông hoa rồi đưa cho bạn gấu.',choices:[['ball','⚽','Ball'],['flower','🌷','Flower'],['car','🚗','Car']],answer:'flower'},
+{type:'say',actor:'👧',line:'Hello! I am your friend!',hint:'Bé nghe và nói lời chào cùng nhân vật.',repeat:'Hello!'}
+]},
+{id:'count',label:'One, two, three',vi:'Đếm vui',icon:'🔢',headline:'Let us count!',tasks:[
+{type:'tap',actor:'🦋',line:'One!',hint:'Một chú bướm. Con chọn số một.',choices:[['one','1️⃣','One'],['two','2️⃣','Two'],['three','3️⃣','Three']],answer:'one'},
+{type:'tap',actor:'🍎🍎',line:'Two apples!',hint:'Có hai quả táo. Con chọn số hai.',choices:[['one','1️⃣','One'],['two','2️⃣','Two'],['three','3️⃣','Three']],answer:'two'},
+{type:'tap',actor:'⭐️⭐️⭐️',line:'Three stars!',hint:'Con nhìn và chọn số ba.',choices:[['four','4️⃣','Four'],['three','3️⃣','Three'],['two','2️⃣','Two']],answer:'three'},
+{type:'say',actor:'🔢',line:'One, two, three!',hint:'Đếm cùng các bạn nhé.',repeat:'One, two, three!'}
+]},
+{id:'size',label:'Big & Small',vi:'To và nhỏ',icon:'🐘',headline:'Big or small?',tasks:[
+{type:'tap',actor:'🐘',line:'Find the big animal!',hint:'Đâu là con vật to nào?',choices:[['big','🐘','Big'],['small','🐭','Small'],['bird','🐦','Bird']],answer:'big'},
+{type:'tap',actor:'🐁',line:'Find the small animal!',hint:'Con vật nhỏ đâu rồi?',choices:[['horse','🐎','Horse'],['elephant','🐘','Elephant'],['mouse','🐁','Mouse']],answer:'mouse'},
+{type:'give',actor:'🐻',line:'Give me the big ball!',hint:'Chọn quả bóng lớn và đưa cho gấu.',choices:[['small','⚪','Small'],['big','⚽','Big'],['star','⭐','Star']],answer:'big'},
+{type:'say',actor:'🐘',line:'It is big!',hint:'Cùng nói: It is big!',repeat:'It is big!'}
+]},
+{id:'color',label:'Colors!',vi:'Màu sắc',icon:'🌈',headline:'A colorful day!',tasks:[
+{type:'tap',actor:'🍎',line:'Touch red!',hint:'Tìm đồ vật màu đỏ nào.',choices:[['blue','🔵','Blue'],['red','🔴','Red'],['yellow','🟡','Yellow']],answer:'red'},
+{type:'tap',actor:'🌞',line:'Touch yellow!',hint:'Tìm màu vàng nào.',choices:[['green','🟢','Green'],['yellow','🟡','Yellow'],['red','🔴','Red']],answer:'yellow'},
+{type:'give',actor:'🐰',line:'Give me the blue ball!',hint:'Đưa quả bóng xanh dương cho bạn thỏ.',choices:[['red','🔴','Red'],['blue','🔵','Blue'],['yellow','🟡','Yellow']],answer:'blue'},
+{type:'say',actor:'🌈',line:'Red, blue, yellow!',hint:'Bé nói tên ba màu cùng bạn nhé.',repeat:'Red, blue, yellow!'}
+]},
+{id:'food',label:'Yummy!',vi:'Đồ ăn',icon:'🍎',headline:'I am hungry!',tasks:[
+{type:'tap',actor:'🐰',line:'Find the apple!',hint:'Quả táo ở đâu nào?',choices:[['pear','🍐','Pear'],['apple','🍎','Apple'],['lemon','🍋','Lemon']],answer:'apple'},
+{type:'give',actor:'🐻',line:'Give me a banana, please!',hint:'Đưa chuối cho gấu nhé.',choices:[['banana','🍌','Banana'],['cake','🍰','Cake'],['bread','🍞','Bread']],answer:'banana'},
+{type:'tap',actor:'🥛',line:'Find the milk!',hint:'Con tìm sữa nhé.',choices:[['water','💧','Water'],['milk','🥛','Milk'],['apple','🍎','Apple']],answer:'milk'},
+{type:'say',actor:'🐰',line:'I like apples!',hint:'Nói cùng bạn: I like apples!',repeat:'I like apples!'}
+]},
+{id:'where',label:'Where is it?',vi:'Ở đâu nhỉ?',icon:'🧸',headline:'Where is my toy?',tasks:[
+{type:'tap',actor:'🧸',line:'Find the toy in the box!',hint:'Đồ chơi trong hộp ở đâu?',choices:[['in','📦🧸','In'],['up','🎈','Up'],['bed','🛏️','Bed']],answer:'in'},
+{type:'tap',actor:'🐈',line:'Look under the table!',hint:'Bạn mèo ở dưới bàn nhé.',choices:[['on','🐈🪑','On'],['under','🪑🐈','Under'],['air','☁️','Sky']],answer:'under'},
+{type:'give',actor:'🐻',line:'Give me the teddy bear, please!',hint:'Đưa gấu bông đến cho bạn.',choices:[['teddy','🧸','Teddy'],['car','🚗','Car'],['ball','⚽','Ball']],answer:'teddy'},
+{type:'say',actor:'🧸',line:'Here it is!',hint:'Bé nói: Here it is!',repeat:'Here it is!'}
+]}
+];
+var screen='home',unit=null,step=0,solved=false,chosen='',wrong='',feedback='',videoLoaded=false,micStream=null,micRecorder=null,recordUrl='',micOn=false,drag=null,runToken=0;
+function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function family(){try{return JSON.parse(localStorage.getItem(DATA_KEY)||'null')}catch(e){return null}}
+function activeKid(){var f=family();return f&&Array.isArray(f.kids)&&f.kids.length>0?(f.active===1?1:0):0}
+function kidName(){var f=family(),i=activeKid();return f&&f.kids&&f.kids[i]?String(f.kids[i].name||'Bé').slice(0,18):'Bé'}
+function extra(){try{return JSON.parse(localStorage.getItem(EXTRA_KEY)||'{}')}catch(e){return {}}}
+function completeKey(id){return 'en_muzzy_'+id}
+function isDone(id){var f=family(),i=activeKid();if(f&&f.kids&&f.kids[i]&&f.kids[i].finished&&f.kids[i].finished[completeKey(id)])return true;var e=extra();return !!(e[i]&&e[i][id])}
+function finishProgress(){var f=family(),i=activeKid(),id=unit.id;if(f&&f.kids&&f.kids[i]){var k=f.kids[i];k.finished=k.finished||{};if(k.finished[completeKey(id)])return;k.finished[completeKey(id)]=new Date().toISOString();k.stars=(Number(k.stars)||0)+4;k.activity=Array.isArray(k.activity)?k.activity:[];k.activity.push({id:completeKey(id),at:new Date().toISOString(),stars:4,kind:'muzzy-companion'});k.activity=k.activity.slice(-250);try{localStorage.setItem(DATA_KEY,JSON.stringify(f));return}catch(e){}}
+var x=extra();x[i]=x[i]||{};x[i][id]=new Date().toISOString();try{localStorage.setItem(EXTRA_KEY,JSON.stringify(x))}catch(e){msg('Bộ nhớ đầy, chưa lưu được tiến độ.')} }
+function msg(v){status.textContent=v||''}
+function top(){return '<header class="top"><a class="back" href="./" aria-label="Trang chủ Bé Vui Học">🏠</a><div class="title">🎬 Học cùng phim MUZZY</div><span class="kid">🧒 '+esc(kidName())+'</span></header>'}
+function home(){var done=offlineUnits.filter(function(x){return isDone(x.id)}).length;return top()+'<section class="hero"><div class="kicker">Bé Vui Học · 4–6 tuổi</div><h1>Học cùng phim <span>MUZZY</span></h1><div class="illustration" aria-hidden="true"><span>🎬</span><span>🎧</span><span>🎮</span></div><p class="hero-desc">Xem hoạt hình Muzzy từ kênh chính thức, rồi chơi game nghe và nói tiếng Anh cùng các bạn nhỏ!</p><div class="hero-actions"><button class="primary" data-act="film">▶ Xem phim Muzzy tập 1</button><button class="secondary" data-act="start" data-id="hello">🎮 Chơi ngay</button></div><p class="notice">Khu luyện tập độc lập, không phải ứng dụng chính thức của BBC/Muzzy. Trò chơi và hình minh họa được tạo riêng, không sao chép phim.</p></section><div class="info-row"><span>⭐ Đã hoàn thành '+done+'/6 chủ đề</span><span>🎮 24 hoạt động</span></div><h2 class="panel-title">🌟 Bé muốn chơi gì hôm nay?</h2><div class="world-grid">'+offlineUnits.map(function(x,i){return '<button class="world" data-act="start" data-id="'+x.id+'"><span class="emoji">'+x.icon+'</span><strong>'+esc(x.label)+'</strong><small>'+esc(x.vi)+'</small>'+(isDone(x.id)?'<span class="stamp">✓ Đã chơi</span>':'<small>▶ '+(i+1)+'/6</small>')+'</button>'}).join('')+'</div><p class="note">Chọn chủ đề bất kỳ, bấm 🔊 để nghe giọng Anh từ máy. Game dùng được khi không có mạng sau khi tải vào bộ nhớ PWA; phim Muzzy trên YouTube cần Internet. Mỗi bé lưu tiến độ riêng trên máy.</p>'}
+function video(){return top()+'<section class="video-card"><div class="kicker">Phim từ kênh YouTube Muzzy</div><h2>🎬 Muzzy in Gondoland – Episode 1</h2>'+(videoLoaded?'<iframe class="video-frame" src="https://www.youtube-nocookie.com/embed/Dtl6z4EPZmE?playsinline=1&rel=0" title="MUZZY in Gondoland - Episode 1 (kênh chính thức)" allow="accelerometer;autoplay;encrypted-media;gyroscope;picture-in-picture;web-share" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>':'<div class="vidicon">📺</div>')+'<p>Đây là tập 1 được đăng bởi kênh Muzzy. Bé xem hoạt hình để nghe tiếng Anh; sau đó trở lại đây để chơi các game luyện tập tự tạo. Phần phát phim sử dụng YouTube, không tải hay lưu bản sao.</p><div class="video-actions">'+(videoLoaded?'<button class="secondary" data-act="stopVideo">⏹ Đóng video</button>':'<button class="primary" data-act="loadVideo">▶ Mở phim tại đây</button>')+'<a class="external" target="_blank" rel="noopener noreferrer" href="'+FILM+'">↗ Mở trên YouTube</a><button class="secondary" data-act="start" data-id="hello">🎮 Chơi sau khi xem</button></div><p class="video-foot">Video yêu cầu Internet và có thể bị hạn chế nhúng tùy YouTube/thiết bị. Khi mở trình phát, YouTube có thể xử lý dữ liệu theo chính sách riêng; phụ huynh nên đồng hành với bé.</p></section>'}
+function toolbar(){var bar='<div class="toolbar"><button class="round" data-act="home" aria-label="Về các chủ đề">←</button><div class="progress">';unit.tasks.forEach(function(t,i){bar+='<i class="'+(i<step?'done':i===step?'active':'')+'"></i>'});return bar+'</div><span class="count">'+(step+1)+' / '+unit.tasks.length+'</span></div>'}
+function choiceHtml(t){var arr=t.choices;return '<div class="choices">'+arr.map(function(c){var cls=solved&&c[0]===t.answer?' ok':chosen===c[0]?' selected':wrong===c[0]?' retry':'';return '<button class="choice'+cls+'" data-act="'+(t.type==='give'?'pick':'choose')+'" data-id="'+esc(c[0])+'" '+(solved?'disabled':'')+'><span class="visual">'+esc(c[1])+'</span><span class="name">'+esc(c[2])+'</span></button>'}).join('')+'</div>'}
+function gameBody(t){if(t.type==='tap')return choiceHtml(t);if(t.type==='give')return choiceHtml(t)+'<button class="drop-area'+(solved?' ok':'')+'" data-act="drop" '+(solved?'disabled':'')+'><span class="friend">'+esc(t.actor)+'</span><span>🎁 Đưa cho bạn</span></button><p class="hint">Kéo thả hoặc chạm món đồ rồi chạm vào bạn.</p>';return '<div class="say-large">'+esc(t.repeat)+'</div><p class="hint">Nghe mẫu rồi nói theo. Bé không bị chấm điểm phát âm.</p><div class="voicebox"><button class="voicebtn'+(micOn?' rec':'')+'" data-act="'+(micOn?'stopRecord':'record')+'">'+(micOn?'⏹ Dừng ghi âm':'🎙 Ghi âm giọng con')+'</button><button class="voicebtn" data-act="said">😊 Con đã nói!</button></div>'+(recordUrl?'<audio class="playback" controls src="'+recordUrl+'" aria-label="Nghe lại giọng của bé"></audio>':'')+'<p class="record-note">Micro là tùy chọn, ba mẹ cần đồng ý. Giọng bé chỉ được giữ tạm trong phiên này, không gửi lên máy chủ.</p>'}
+function play(){var t=unit.tasks[step];return top()+toolbar()+'<section class="game"><div class="game-label">🎮 '+esc(unit.vi)+'</div><div class="game-icon" aria-hidden="true">'+esc(t.actor)+'</div><div class="phrase">'+esc(t.line)+'</div><p class="hint">'+esc(t.hint)+'</p><button class="listen" data-act="listen">🔊 Nghe tiếng Anh</button>'+gameBody(t)+'<p class="feedback'+(wrong?' retry':'')+'" role="status">'+esc(feedback)+'</p><div class="actions"><button class="primary" data-act="next" '+(solved?'':'disabled')+'>'+(step===unit.tasks.length-1?'🏆 Hoàn thành!':'Tiếp tục ➜')+'</button></div></section>'}
+function reward(){return top()+'<section class="finish"><div class="big">🏆</div><h1>Great job!</h1><p>Con đã hoàn thành chủ đề <strong>'+esc(unit.label)+'</strong>.</p><p>🌟 Nhận 4 sao khi hoàn thành lần đầu. Con có thể chơi lại để nghe và nói tự nhiên nhé!</p><div class="actions"><button class="secondary" data-act="replay">🔁 Chơi lại</button><button class="primary" data-act="home">🏡 Chọn chủ đề khác</button></div></section>'}
+function render(){app.innerHTML=screen==='home'?home():screen==='video'?video():screen==='play'?play():reward()}
+function speech(phrase){msg('');if(!('speechSynthesis' in window)){msg('Thiết bị chưa có giọng đọc. Ba mẹ có thể cài giọng tiếng Anh trong cài đặt máy.');return}try{speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(phrase);u.lang='en-US';u.rate=.82;u.pitch=1;var voices=speechSynthesis.getVoices();var v=voices.find(function(v){return /^en[-_]US/i.test(v.lang)})||voices.find(function(v){return /^en[-_]/i.test(v.lang)});if(v)u.voice=v;u.onerror=function(){msg('Chưa phát được tiếng Anh. Kiểm tra giọng đọc/âm lượng trên máy.')};speechSynthesis.speak(u)}catch(e){msg('Trình duyệt chưa phát được tiếng Anh.')}}
+function clearMic(){runToken++;if(micRecorder&&micRecorder.state!=='inactive')try{micRecorder.onstop=null;micRecorder.stop()}catch(e){}if(micStream){micStream.getTracks().forEach(function(x){x.stop()});micStream=null}micOn=false;if(recordUrl){URL.revokeObjectURL(recordUrl);recordUrl=''}}
+function begin(id){var next=offlineUnits.find(function(x){return x.id===id});if(!next)return;clearMic();videoLoaded=false;unit=next;step=0;screen='play';solved=false;chosen='';wrong='';feedback='';render();window.scrollTo(0,0);speech(unit.tasks[0].line)}
+function homeNow(){clearMic();videoLoaded=false;screen='home';unit=null;if('speechSynthesis' in window)speechSynthesis.cancel();render();window.scrollTo(0,0)}
+function correct(){if(solved)return;solved=true;wrong='';feedback='🌟 Great job! Giỏi lắm!';render();speech('Great job!')}
+function answer(id){if(solved)return;var t=unit.tasks[step];if(id===t.answer){correct()}else{wrong=id;feedback='💛 Try again! Con thử lại nhé.';render();speech(t.line)}}
+function next(){if(!solved)return;clearMic();if(step<unit.tasks.length-1){step++;solved=false;chosen='';wrong='';feedback='';render();speech(unit.tasks[step].line)}else{finishProgress();screen='reward';render();speech('Hooray! Great job!')}}
+async function record(){if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia||typeof MediaRecorder==='undefined'){msg('Thiết bị không hỗ trợ ghi âm. Con vẫn có thể tập nói nhé.');return}
+if(!sessionStorage.getItem('muzzy-mic-ok')){if(!confirm('Phụ huynh đồng ý để bé ghi âm trong phiên này? Âm thanh chỉ lưu tạm trong trình duyệt, không tải lên máy chủ.'))return;sessionStorage.setItem('muzzy-mic-ok','1')}
+try{clearMic();var token=runToken;micStream=await navigator.mediaDevices.getUserMedia({audio:true});if(token!==runToken||screen!=='play'){micStream.getTracks().forEach(function(t){t.stop()});micStream=null;return}var chunks=[];micRecorder=new MediaRecorder(micStream);micRecorder.ondataavailable=function(e){if(e.data&&e.data.size)chunks.push(e.data)};micRecorder.onstop=function(){if(token!==runToken)return;if(!chunks.length)return;if(recordUrl)URL.revokeObjectURL(recordUrl);recordUrl=URL.createObjectURL(new Blob(chunks,{type:micRecorder.mimeType||'audio/webm'}));if(screen==='play')render()};micRecorder.start();micOn=true;render();msg('🎙 Đang ghi âm. Con nói và bấm Dừng nhé.')}catch(e){clearMic();msg('Chưa mở được micro. Bé vẫn có thể nghe và nói theo mà không ghi âm.')}}
+function stopRecord(){if(!micOn)return;micOn=false;try{if(micRecorder&&micRecorder.state!=='inactive')micRecorder.stop()}catch(e){}if(micStream){micStream.getTracks().forEach(function(x){x.stop()});micStream=null}render()}
+app.addEventListener('click',function(e){var btn=e.target.closest('[data-act]');if(!btn)return;var act=btn.dataset.act,id=btn.dataset.id;
+if(act==='start')begin(id);
+else if(act==='film'){screen='video';videoLoaded=false;render();window.scrollTo(0,0)}
+else if(act==='loadVideo'){videoLoaded=true;render()}
+else if(act==='stopVideo'){videoLoaded=false;render()}
+else if(act==='home')homeNow();
+else if(act==='listen'&&unit)speech(unit.tasks[step].line);
+else if(act==='choose')answer(id);
+else if(act==='pick'){if(solved)return;chosen=id;wrong='';render();msg('Đã chọn! Con đưa món đồ cho bạn nhé.')}
+else if(act==='drop'){if(chosen)answer(chosen);else msg('Chọn một món đồ trước nhé!')}
+else if(act==='said')correct();
+else if(act==='record')record();
+else if(act==='stopRecord')stopRecord();
+else if(act==='next')next();
+else if(act==='replay'&&unit)begin(unit.id);
+});
+app.addEventListener('pointerdown',function(e){var btn=e.target.closest('[data-act="pick"]');if(!btn||solved||e.button!==0)return;drag={id:btn.dataset.id,x:e.clientX,y:e.clientY,ghost:null}});
+app.addEventListener('pointermove',function(e){if(!drag)return;var dx=e.clientX-drag.x,dy=e.clientY-drag.y;if(!drag.ghost&&dx*dx+dy*dy>180){var it=unit.tasks[step].choices.find(function(c){return c[0]===drag.id});var g=document.createElement('div');g.className='drag-ghost';g.textContent=it?it[1]:'🎁';document.body.appendChild(g);drag.ghost=g}if(drag.ghost){drag.ghost.style.left=e.clientX+'px';drag.ghost.style.top=e.clientY+'px';e.preventDefault()}});
+app.addEventListener('pointerup',function(e){if(!drag)return;var d=drag;drag=null;if(!d.ghost)return;d.ghost.remove();var hit=document.elementFromPoint(e.clientX,e.clientY);if(hit&&hit.closest('[data-act="drop"]')){chosen=d.id;answer(d.id)}else{chosen=d.id;render();msg('Đã chọn đồ vật. Con đưa món đồ cho bạn nhé.')}});
+app.addEventListener('pointercancel',function(){if(drag&&drag.ghost)drag.ghost.remove();drag=null});
+window.addEventListener('pagehide',function(){clearMic();if('speechSynthesis' in window)speechSynthesis.cancel()});
+render();
+})();
+</script>
+</body>
+</html>
